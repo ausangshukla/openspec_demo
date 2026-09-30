@@ -12,12 +12,12 @@
 - [ ] 1.1 Add migrations `create_scheduled_transfers` and `create_transfer_executions` with every index in design.md → Data Model (amounts as `bigint` cents); migrate and verify both tables and all six indexes appear in `db/schema.rb` · *Data Model*
 - [ ] 1.2 Create `ScheduledTransfer` and `TransferExecution` models (statuses, `changeable?` with the 22:00 cut-off, `cancel!`); verify in `rails runner` that `changeable?` is true at 21:59 and false at 22:00 the evening before `due_on` · *State Transitions*
 - [ ] 1.3 Create `PaymentDateCalculator` (nominal date for occurrence n with month-end clamp; `due_on` via `BankHolidayCalendar#next_working_day`); verify in `rails runner` that day 31 gives 30 Apr 2027 and that 26 Nov 2026 gives 27 Nov 2026 · *Key Components, E1, E2*
-- [ ] 1.4 Create `ScheduleTransferService` (validation rules from the proposal, schedule + first execution in one transaction, `RecordNotUnique` on `request_key` returns the existing schedule); verify that two calls with the same `request_key` return the same record · *Key Components, Transactions*
+- [ ] 1.4 Create `ScheduleTransferService` (validation rules BR-1 to BR-4, BR-9 and BR-17 from business-rules.md, schedule + first execution in one transaction, `RecordNotUnique` on `request_key` returns the existing schedule); verify that two calls with the same `request_key` return the same record · *Key Components, Transactions*
 - [ ] 1.5 Create `ScheduledTransferPolicy` and its `Scope` (holder can view/cancel, only creator can edit, scoped through `current_customer.accounts`); verify in `rails runner` that Dev can `cancel?` but not `update?` Asha's joint-account payment · *Policy*
 - [ ] 1.6 Create `ScheduledTransfersController` and routes from design.md → Controllers and Routes; verify `bin/rails routes | grep scheduled` lists all seven · *Controllers and Routes*
 - [ ] 1.7 Build the Schedule a payment form, Upcoming payments list and payment detail (Journeys 1 and 2, including the live adjusted-date message and Confirm disabled after first tap); verify both journeys by hand in dev · *UI Changes*
 - [ ] 1.8 Update `PayeesController#destroy` to warn and cancel scheduled payments to the payee in one transaction; verify in dev that deleting a payee with two payments shows the warning · *Transactions*
-- [ ] 1.9 Add the "Scheduling a payment" section to the customer help pages; verify every message matches the proposal's Behavior Rules verbatim
+- [ ] 1.9 Add the "Scheduling a payment" section to the customer help pages; verify every message matches business-rules.md Customer Wording (MSG-n) verbatim
 - [ ] 1.10 Add `features/support/scheduled_transfers.rb` (Asha / Dev / Omar shared setup) and `scheduled_transfer_steps.rb`, then write `features/payments/scheduled_transfers/scheduling.feature` covering worked examples H1, E1, E2, E3, E5, E6, E7, E8, X5, X6. Run `TEST_ENV_NUMBER=$RANDOM bundle exec cucumber features/payments/scheduled_transfers/scheduling.feature` and confirm it passes before starting phase 2
 
 ## 2. Overnight run and debit
@@ -33,7 +33,7 @@
 ## 3. Funds short, retry and notify
 
 - [ ] 3.1 Route insufficient funds on attempt 1 to `awaiting_funds` and create `InsufficientFundsRetryJob` (18:00 cron, attempt 2 fails the payment); verify in `rails runner` with a $300.00 balance · *Decision Flows*
-- [ ] 3.2 Add the customer notification templates (paid, waiting for funds, failed, account unavailable) using `CustomerNotifier`, with SMS only on failures and masked account numbers; verify the rendered text matches the proposal verbatim · *Exception Handling and Monitoring*
+- [ ] 3.2 Add the customer notification templates (paid, waiting for funds, failed, account unavailable) using `CustomerNotifier`, with SMS only on failures and masked account numbers; verify the rendered text matches business-rules.md MSG-3, MSG-4, MSG-9 and MSG-10 verbatim · *Exception Handling and Monitoring*
 - [ ] 3.3 Make a failed occurrence still plan the next one for recurring schedules; verify with the H3 rent schedule · *State Transitions*
 - [ ] 3.4 Write `features/payments/scheduled_transfers/retry.feature` covering worked examples H4, E4, E10, X1. Run `TEST_ENV_NUMBER=$RANDOM bundle exec cucumber features/payments/scheduled_transfers/retry.feature` and confirm it passes before starting phase 4
 

@@ -1,7 +1,7 @@
 # [Feature Name] — Proposal
 
 > **Audience:** Business team, product, QA, support — non-technical.
-> **Companion document:** [Design](design.md)
+> **Companion documents:** [Business rules](business-rules.md) · [Design](design.md)
 
 > **Planning phase — no code changes.** This document proposes and explains the change. Do not
 > edit application code while writing it; implementation happens later, in the tasks phase.
@@ -84,27 +84,12 @@
 
 ---
 
-## Validation Rules
+## Business Rules and Decisions
 
-| Field | Rule | Default |
-|---|---|---|
-| <!-- field --> | <!-- rule --> | <!-- default --> |
+<!-- Not here. Validation rules, behaviour rules, decisions and exact customer wording live in
+     business-rules.md, the next document. Refer to them by ID (BR-n, D-n, MSG-n). -->
 
----
-
-## Behavior Rules
-
-| Scenario | What User Sees |
-|---|---|
-| <!-- scenario --> | <!-- result --> |
-
----
-
-## Resolved Design Decisions
-
-| # | Decision | Resolution |
-|---|---|---|
-| 1 | <!-- question --> | <!-- resolution --> |
+See [business-rules.md](business-rules.md).
 
 ---
 

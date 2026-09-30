@@ -14,8 +14,8 @@
 > **CONDITIONAL** say when they apply. When one doesn't apply, keep the heading and write a single
 > line: `N/A — <reason>`. A small change should produce a short document.
 
-> **No repetition.** Each fact lives in one section. The proposal owns *what users see and the
-> business rules*, the spec owns *requirements*, and this document owns *how*. Link instead of
+> **No repetition.** Each fact lives in one section. The proposal owns *what users see*,
+> business-rules.md owns *the business rules*, the spec owns *requirements*, and this document owns *how*. Link instead of
 > restating.
 
 > **FAQ tables are optional.** Add one under a section only when there is a non-obvious "why" or
@@ -237,8 +237,9 @@ sequenceDiagram
 ### Worked Examples
 
 <!-- CORE. Three tables, not prose. One row per example, IDs H1.., E1.., X1.. Each row becomes
-     exactly one Cucumber scenario in the named feature file. The Spec scenario column names the
-     spec scenario(s) the row proves. Every spec scenario must appear in at least one row, so a
+     exactly one Cucumber scenario in the named feature file. The Rule column names the BR IDs
+     from business-rules.md the row proves (— for engineering-only cases), and the Spec scenario
+     column names the spec scenario(s). Every spec scenario must appear in at least one row, so a
      reviewer can spot gaps by scanning that column. Use real-ish data from the shared setup. -->
 
 **ID legend:** **H** = Happy path · **E** = Edge case · **X** = Error (exception) case. IDs are
@@ -252,21 +253,21 @@ referenced from tasks.md and Cucumber scenario names.
 
 #### Happy Path
 
-| # | Scenario | Given | When | Then | Spec scenario | Feature |
-|---|---|---|---|---|---|---|
-| H1 | <!-- short title --> | <!-- starting state --> | <!-- action --> | <!-- observable result --> | <!-- spec scenario name --> | <!-- feature file --> |
+| # | Scenario | Given | When | Then | Rule | Spec scenario | Feature |
+|---|---|---|---|---|---|---|---|
+| H1 | <!-- short title --> | <!-- starting state --> | <!-- action --> | <!-- observable result --> | <!-- BR IDs, or — --> | <!-- spec scenario name --> | <!-- feature file --> |
 
 #### Edge Cases
 
-| # | Scenario | Given | When | Then | Spec scenario | Feature |
-|---|---|---|---|---|---|---|
-| E1 | <!-- boundary / duplicate / concurrency / empty --> | | | | | |
+| # | Scenario | Given | When | Then | Rule | Spec scenario | Feature |
+|---|---|---|---|---|---|---|---|
+| E1 | <!-- boundary / duplicate / concurrency / empty --> | | | | | | |
 
 #### Error Cases
 
-| # | Scenario | Given | When | Then (what the user sees, who is alerted) | Spec scenario | Feature |
-|---|---|---|---|---|---|---|
-| X1 | <!-- invalid input / unauthorized / external failure --> | | | | | |
+| # | Scenario | Given | When | Then (what the user sees, who is alerted) | Rule | Spec scenario | Feature |
+|---|---|---|---|---|---|---|---|
+| X1 | <!-- invalid input / unauthorized / external failure --> | | | | | | |
 
 ---
 

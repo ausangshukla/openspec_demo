@@ -1,7 +1,7 @@
 # Scheduled & Recurring Transfers — Design
 
 > **Audience:** Engineering team.
-> **Companion documents:** [Proposal](proposal.md) · [Spec](specs/)
+> **Companion documents:** [Proposal](proposal.md) · [Business rules](business-rules.md) · [Spec](specs/)
 
 > **Planning phase — no code changes.** This document explains HOW the proposal will be built.
 > Do not edit application code while writing it; implementation happens later, in the tasks phase.
@@ -443,7 +443,8 @@ sequenceDiagram
 ### Worked Examples
 
 **ID legend:** **H** = Happy path · **E** = Edge case · **X** = Error (exception) case. IDs are
-referenced from tasks.md and Cucumber scenario names.
+referenced from tasks.md and Cucumber scenario names. **Rule** = the business rules (BR-n in
+business-rules.md) the row proves; — marks an engineering-only case.
 
 **Shared setup:** today is Wed 30 Sep 2026. Daily transfer limit $5,000.00.
 
@@ -459,39 +460,39 @@ referenced from tasks.md and Cucumber scenario names.
 
 #### Happy Path
 
-| # | Scenario | Given | When | Then | Spec scenario | Feature |
-|---|---|---|---|---|---|---|
-| H1 | One-off scheduled | Shared setup | Asha schedules $400.00 to Ravi Kumar from ••4821 for Thu 15 Oct 2026 | Execution `scheduled`, due 15 Oct; "Payment scheduled" with reference; listed in Upcoming | One-off transfer scheduled | scheduling |
-| H2 | Payment made | H1; balance $2,500.00 on 15 Oct | EOD completes, run starts; network confirms | Debited once; `completed`; balance $2,100.00; push "…has been made" | Payment made | execution |
-| H3 | Rent rolls forward | Monthly $1,200.00 to Ravi, day 1, until cancelled | Run on Mon 2 Nov (1 Nov is a Sunday) completes | Paid 2 Nov; next execution nominal 1 Dec, due Tue 1 Dec, `scheduled` | Recurring monthly transfer scheduled · Recurring schedule rolls forward | execution |
-| H4 | Retry succeeds | H1; balance $300.00 on 15 Oct morning | Salary $3,000.00 arrives 14:00; 18:00 retry | `awaiting_funds` then `completed`; push "try again at 6 pm" then "…has been made" | Retry succeeds | retry |
-| H5 | Transitions audited | H2 | Audit history of ••4821 is viewed | Two entries: scheduled→processing (actor: payment run), processing→completed (actor: network confirmation) | Status change audited | audit |
+| # | Scenario | Given | When | Then | Rule | Spec scenario | Feature |
+|---|---|---|---|---|---|---|---|
+| H1 | One-off scheduled | Shared setup | Asha schedules $400.00 to Ravi Kumar from ••4821 for Thu 15 Oct 2026 | Execution `scheduled`, due 15 Oct; "Payment scheduled" with reference; listed in Upcoming | BR-1, BR-2, BR-3 | One-off transfer scheduled | scheduling |
+| H2 | Payment made | H1; balance $2,500.00 on 15 Oct | EOD completes, run starts; network confirms | Debited once; `completed`; balance $2,100.00; push "…has been made" | BR-15 | Payment made | execution |
+| H3 | Rent rolls forward | Monthly $1,200.00 to Ravi, day 1, until cancelled | Run on Mon 2 Nov (1 Nov is a Sunday) completes | Paid 2 Nov; next execution nominal 1 Dec, due Tue 1 Dec, `scheduled` | BR-4, BR-5 | Recurring monthly transfer scheduled · Recurring schedule rolls forward | execution |
+| H4 | Retry succeeds | H1; balance $300.00 on 15 Oct morning | Salary $3,000.00 arrives 14:00; 18:00 retry | `awaiting_funds` then `completed`; push "try again at 6 pm" then "…has been made" | BR-8, BR-15 | Retry succeeds | retry |
+| H5 | Transitions audited | H2 | Audit history of ••4821 is viewed | Two entries: scheduled→processing (actor: payment run), processing→completed (actor: network confirmation) | BR-16 | Status change audited | audit |
 
 #### Edge Cases
 
-| # | Scenario | Given | When | Then | Spec scenario | Feature |
-|---|---|---|---|---|---|---|
-| E1 | Bank holiday | Shared setup | Asha picks Thu 26 Nov 2026 (Thanksgiving) | Form shows "…made on Fri 27 Nov 2026, the next working day."; `due_on` 27 Nov, `nominal_on` 26 Nov | Due date is a bank holiday | scheduling |
-| E2 | 31st in April | Monthly $100.00 to City Water, day 31, first on Wed 31 Mar 2027 | April execution is planned | `nominal_on` 30 Apr, `due_on` Fri 30 Apr 2027; May's `nominal_on` returns to 31 May (Memorial Day, so `due_on` Tue 1 Jun) | Monthly on the 31st in a 30-day month | scheduling |
-| E3 | Double-tap Confirm | Asha on the review screen for H1 | Two identical submits with the same `request_key` within 1 s | One `ScheduledTransfer`; both responses show the same reference | Duplicate confirmation | scheduling |
-| E4 | Overdraft not used | Balance $300.00, overdraft $500.00, payment $400.00 | Morning run | `awaiting_funds`; no debit, although $800.00 is available with overdraft | Overdraft never used | retry |
-| E5 | Cancel before cut-off | H1 | Asha cancels at 21:30 Wed 14 Oct | `cancelled`; run on 15 Oct skips it | Cancel before cut-off | scheduling |
-| E6 | Change after cut-off | H1 | Asha tries to cancel at 22:05 Wed 14 Oct | Refused: "This payment is being processed and can no longer be changed." | Change after cut-off | scheduling |
-| E7 | Joint co-holder | Asha scheduled $250.00 from Joint ••9012 | Dev cancels it; separately Dev tries to edit another of Asha's | Cancel succeeds; edit refused "Only the person who set up this payment can change it." | Co-holder cancels · Co-holder cannot edit | scheduling |
-| E8 | Payee deleted | Two scheduled payments to City Water | Asha deletes City Water and confirms the warning | Payee deleted; both executions and schedules `cancelled` | Deleting a payee with scheduled payments | scheduling |
-| E9 | Run started twice | H1 due 15 Oct | EOD completion event is delivered twice | Second run finds nothing `scheduled` for the date; one debit only | Run repeated | execution |
-| E10 | Failure doesn't stop rent | H3 rent fails on 2 Nov (X1) | Planner runs | 1 Dec execution `scheduled` | Recurring schedule rolls forward | retry |
+| # | Scenario | Given | When | Then | Rule | Spec scenario | Feature |
+|---|---|---|---|---|---|---|---|
+| E1 | Bank holiday | Shared setup | Asha picks Thu 26 Nov 2026 (Thanksgiving) | Form shows "…made on Fri 27 Nov 2026, the next working day."; `due_on` 27 Nov, `nominal_on` 26 Nov | BR-5 | Due date is a bank holiday | scheduling |
+| E2 | 31st in April | Monthly $100.00 to City Water, day 31, first on Wed 31 Mar 2027 | April execution is planned | `nominal_on` 30 Apr, `due_on` Fri 30 Apr 2027; May's `nominal_on` returns to 31 May (Memorial Day, so `due_on` Tue 1 Jun) | BR-6 | Monthly on the 31st in a 30-day month | scheduling |
+| E3 | Double-tap Confirm | Asha on the review screen for H1 | Two identical submits with the same `request_key` within 1 s | One `ScheduledTransfer`; both responses show the same reference | BR-17 | Duplicate confirmation | scheduling |
+| E4 | Overdraft not used | Balance $300.00, overdraft $500.00, payment $400.00 | Morning run | `awaiting_funds`; no debit, although $800.00 is available with overdraft | BR-7 | Overdraft never used | retry |
+| E5 | Cancel before cut-off | H1 | Asha cancels at 21:30 Wed 14 Oct | `cancelled`; run on 15 Oct skips it | BR-10 | Cancel before cut-off | scheduling |
+| E6 | Change after cut-off | H1 | Asha tries to cancel at 22:05 Wed 14 Oct | Refused: "This payment is being processed and can no longer be changed." | BR-10 | Change after cut-off | scheduling |
+| E7 | Joint co-holder | Asha scheduled $250.00 from Joint ••9012 | Dev cancels it; separately Dev tries to edit another of Asha's | Cancel succeeds; edit refused "Only the person who set up this payment can change it." | BR-11 | Co-holder cancels · Co-holder cannot edit | scheduling |
+| E8 | Payee deleted | Two scheduled payments to City Water | Asha deletes City Water and confirms the warning | Payee deleted; both executions and schedules `cancelled` | BR-12 | Deleting a payee with scheduled payments | scheduling |
+| E9 | Run started twice | H1 due 15 Oct | EOD completion event is delivered twice | Second run finds nothing `scheduled` for the date; one debit only | — | Run repeated | execution |
+| E10 | Failure doesn't stop rent | H3 rent fails on 2 Nov (X1) | Planner runs | 1 Dec execution `scheduled` | BR-13 | Recurring schedule rolls forward | retry |
 
 #### Error Cases
 
-| # | Scenario | Given | When | Then (what the user sees, who is alerted) | Spec scenario | Feature |
-|---|---|---|---|---|---|---|
-| X1 | Still short after retry | H1; balance $300.00 all day | 18:00 retry | `failed`, reason insufficient_funds; push + SMS "…couldn't be made because there wasn't enough money…"; no debit | Still short after retry | retry |
-| X2 | Timeout after debit | H2, but network times out after send | Reconcile 15 min later: network says settled / not found | Settled → `completed`. Not found → reversal credit $400.00, `failed`, push. Never resent under a new reference | Timeout after debit | execution |
-| X3 | Network down | Network refuses connections from 02:10 | 15 minutes pass | Ops alerted once; executions stay `processing` with outbox pending; sent on recovery | Network unavailable | audit |
-| X4 | Frozen account | ••4821 frozen on 14 Oct | Run on 15 Oct | `failed`, reason account_unavailable; push + SMS "…Please contact us." | Frozen account on the payment date | execution |
-| X5 | Over daily limit | Shared setup | Asha enters $6,000.00 | Inline "This is more than your daily transfer limit of $5,000.00."; nothing saved | Amount above daily limit | scheduling |
-| X6 | Someone else's account | Omar logged in | Omar submits a schedule with `account_id` of ••4821 | "Account not found"; nothing saved; security event logged | Another customer's account | scheduling |
+| # | Scenario | Given | When | Then (what the user sees, who is alerted) | Rule | Spec scenario | Feature |
+|---|---|---|---|---|---|---|---|
+| X1 | Still short after retry | H1; balance $300.00 all day | 18:00 retry | `failed`, reason insufficient_funds; push + SMS "…couldn't be made because there wasn't enough money…"; no debit | BR-8, BR-15 | Still short after retry | retry |
+| X2 | Timeout after debit | H2, but network times out after send | Reconcile 15 min later: network says settled / not found | Settled → `completed`. Not found → reversal credit $400.00, `failed`, push. Never resent under a new reference | — | Timeout after debit | execution |
+| X3 | Network down | Network refuses connections from 02:10 | 15 minutes pass | Ops alerted once; executions stay `processing` with outbox pending; sent on recovery | — | Network unavailable | audit |
+| X4 | Frozen account | ••4821 frozen on 14 Oct | Run on 15 Oct | `failed`, reason account_unavailable; push + SMS "…Please contact us." | BR-14 | Frozen account on the payment date | execution |
+| X5 | Over daily limit | Shared setup | Asha enters $6,000.00 | Inline "This is more than your daily transfer limit of $5,000.00."; nothing saved | BR-9 | Amount above daily limit | scheduling |
+| X6 | Someone else's account | Omar logged in | Omar submits a schedule with `account_id` of ••4821 | "Account not found"; nothing saved; security event logged | BR-1 | Another customer's account | scheduling |
 
 ---
 
@@ -626,7 +627,7 @@ Upcoming payments › Ravi Kumar $1,200.00
 ### Journey 3: A payment can't be made
 
 No screen of its own. The customer receives the push (and, on failure, SMS) messages from the
-proposal's Behavior Rules; tapping the push opens the payment, whose status history shows each
+business-rules.md Customer Wording (MSG-3, MSG-4, MSG-9, MSG-10); tapping the push opens the payment, whose status history shows each
 attempt and the failure reason in plain words.
 
 ### Build notes (for implementers)
@@ -727,7 +728,7 @@ tag). New step file `scheduled_transfer_steps.rb`; account, payee and notificati
 - Bank holiday calendar is wrong or missing a year → reuse the existing calendar, which operations
   already maintain; add a startup check that next year's calendar is loaded.
 - Many customers are paid on the same day as rent is due → the 18:00 retry exists for this; the
-  proposal's behaviour rules tell customers about the retry.
+  customer wording (MSG-3) tells customers about the retry.
 
 | # | Open question | Current thinking | Status |
 |---|---|---|---|

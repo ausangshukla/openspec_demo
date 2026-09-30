@@ -19,10 +19,11 @@ artifacts:
       - **What Changes**: What changes for the user/business, in plain language, with a mermaid
         flowchart pair (before/after, never ASCII art) for each existing flow the change alters. Mark breaking changes with
         **BREAKING**.
-      - **User Stories**, **UI Behavior**, **What This Feature Does NOT Cover**, **Validation
-        Rules**, **Behavior Rules**, **Resolved Design Decisions**: fill these in with concrete,
-        testable detail - specific UI elements, messages, and scenarios, not code. These sections
-        are what QA and support will use to verify the feature by hand.
+      - **User Stories**, **UI Behavior**, **What This Feature Does NOT Cover**: fill these in
+        with concrete, testable detail - specific UI elements and scenarios, not code. Keep the
+        proposal HIGH LEVEL: business rules, decisions, validation rules and exact customer
+        wording do NOT go here - they belong in business-rules.md (the next artifact). Refer to
+        them by ID (BR-n, D-n, MSG-n) once that document exists.
       - **Capabilities**: Identify which specs will be created or modified:
         - **New Capabilities**: List capabilities being introduced. Each becomes a new `specs/<capability-path>/spec.md`. Use kebab-case for path segments you introduce (e.g., `user-auth` or `identity/user-auth`) and follow the project's existing spec organization.
         - **Modified Capabilities**: List existing capabilities whose REQUIREMENTS are changing. Only include if spec-level behavior changes (not just implementation details). Each needs a delta spec file. Use the exact existing path under `openspec/specs/`. Leave empty if no requirement changes.
@@ -65,6 +66,51 @@ artifacts:
 
       This is the foundation - specs, design, and tasks all build on this.
     requires: []
+
+  - id: business-rules
+    generates: business-rules.md
+    description: Business rules, decisions and customer wording - the single place the business's rules live
+    template: business-rules.md
+    instruction: |
+      Create the business rules and decisions document: the ONE place where every business rule,
+      every business decision and every piece of customer-facing wording for this change lives.
+      It is written for product, risk, compliance and operations - non-technical. Nothing here
+      should require knowing the codebase. The proposal stays high level and refers here by ID.
+
+      **Planning only: do not make any code changes while writing this document.**
+
+      Inputs to read before asking anything: the proposal, existing policies and regulations the
+      user points you to, product rules, meeting notes, and existing behaviour in the code (so you
+      can say what the system does today).
+
+      Probe the user - do not guess. For every rule, ask until you know:
+      - who owns it (a role: product, risk, compliance, operations) and where it comes from
+        (a policy, a regulation, or a product decision);
+      - its exceptions and edge cases: weekends and holidays, month ends, limits, joint or
+        shared ownership, frozen or closed accounts, failures and retries, duplicates;
+      - what the customer sees, word for word;
+      - whether it conflicts with another rule.
+      Before finishing, REFLECT BACK a plain-language summary: the rules, the decisions, and any
+      assumption you made, and ask the user to confirm or correct it. Record anything unresolved
+      in Open Questions; a question that would change what gets built must be answered now.
+
+      Sections (follow the template's structure and order):
+      - **Rule Catalogue**: one row per rule. ID `BR-1`, `BR-2`, ... ; the rule as one plain,
+        testable sentence; category; owner; source (policy / regulation / D-n); customer wording
+        (MSG-n) where it applies. Every rule must be testable.
+      - **Decisions**: one row per decision the business made. ID `D-1`, ... ; the question; the
+        decision; the rationale; alternatives considered and why rejected; decided by (role).
+        Rules that come from a decision cite it as their source.
+      - **Input Validation**: field, rule, default, and the message shown (MSG-n).
+      - **Customer Wording**: ID `MSG-1`, ... ; when it is shown; the exact text; channel. This is
+        the only place customer wording is defined; QA checks it verbatim.
+      - **Open Questions**: genuinely deferrable unknowns only, with owner and status.
+      - **Sign-off**: one row per owning role.
+
+      Downstream contract: the design's Worked Examples cite BR IDs in a Rule column, and every
+      BR must be proven by at least one worked example.
+    requires:
+      - proposal
 
   - id: specs
     generates: "specs/**/*.md"
@@ -167,6 +213,7 @@ artifacts:
       Cucumber scenario written in the tasks phase.
     requires:
       - proposal
+      - business-rules
 
   - id: design
     generates: design.md
@@ -221,9 +268,11 @@ artifacts:
           with real participants and alt/else/loop.
         - **Worked Examples** (CORE, placed right after the sequences): Happy Path (H1..), Edge
           Cases (E1..) and Error Cases (X1.., X for eXception) tables with columns # | Scenario | Given | When |
-          Then | Spec scenario | Feature, using real-ish data from a shared-setup table. Every
-          spec scenario must appear in the Spec scenario column of at least one row. Check this
-          before finishing and add rows for any gaps. Each row becomes exactly one Cucumber
+          Then | Rule | Spec scenario | Feature, using real-ish data from a shared-setup table.
+          Rule = the BR IDs from business-rules.md that the row proves, or "—" for an
+          engineering-only case. Every spec scenario must appear in the Spec scenario column,
+          and every BR in the Rule column, of at least one row. Check this before finishing and
+          add rows for any gaps. Each row becomes exactly one Cucumber
           scenario. Prose Given/When/Then bullets are not acceptable.
       - **Key Components** (CONDITIONAL, when there are services/jobs): a responsibility table,
         plus a decision flowchart for every non-trivial decision (matching, routing,
@@ -255,6 +304,7 @@ artifacts:
         task breakdown, resolve it with the user now instead of guessing.
     requires:
       - proposal
+      - business-rules
 
   - id: lld
     generates: lld.md
@@ -301,7 +351,7 @@ artifacts:
         so a failed row maps straight to its Cucumber scenario.
       - Every step of every UI journey in design.md "UI Changes" becomes a row, with IDs J1.1,
         J1.2, ... (journey.step).
-      - Every user-facing message in the proposal's Behavior Rules / Validation Rules is checked
+      - Every customer message in business-rules.md (Customer Wording, MSG-n) is checked
         verbatim in at least one row's Expected result.
       - The role → access table from design.md Policy becomes the Role sweep matrix.
 
@@ -317,6 +367,7 @@ artifacts:
         end (tester, build/commit, environment, date, result, open defects).
     requires:
       - specs
+      - business-rules
       - design
 
   - id: tasks

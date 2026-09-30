@@ -1,7 +1,7 @@
 # Scheduled & Recurring Transfers — Proposal
 
 > **Audience:** Business team, product, risk, operations, QA, customer support — non-technical.
-> **Companion document:** [Design](design.md)
+> **Companion documents:** [Business rules](business-rules.md) · [Design](design.md)
 
 > **Planning phase — no code changes.** This document proposes and explains the change. Do not
 > edit application code while writing it; implementation happens later, in the tasks phase.
@@ -22,19 +22,17 @@ Customers can schedule a transfer to a saved payee for a future date, once or on
 schedule, from the mobile and web app. The bank makes the payment on the day, tells the customer
 how it went, and never takes the account into overdraft to do it.
 
-- A customer can schedule a **one-off** transfer for a date between tomorrow and 365 days ahead.
-- A customer can schedule a **recurring** transfer: weekly or monthly, ending after a number of
-  payments, on an end date, or when cancelled.
-- If the date is a **weekend or bank holiday**, the payment is made on the **next working day**,
-  and the customer sees the adjusted date before confirming.
-- A monthly payment set for the 29th, 30th or 31st is made on the **last day of shorter months**.
-- On the day, if there is **not enough money**, the bank tries **once more at 6 pm**. If there is
-  still not enough, the payment fails and the customer is told by push notification and SMS.
-  **The overdraft is never used** for a scheduled payment.
-- A customer can **edit or cancel** a scheduled payment until **10 pm the evening before** it is
-  due (the cut-off). After that it cannot be changed.
-- Every scheduled payment appears in a new **Upcoming payments** list, and every change of status
-  is recorded in the account's audit history.
+- A customer can schedule a **one-off** or **recurring** (weekly or monthly) transfer to a saved
+  payee.
+- Payments due on a **weekend or bank holiday**, or on a day a month doesn't have, move to a
+  sensible date, and the customer sees it before confirming.
+- If there is **not enough money** on the day, the bank tries again later that day, then tells the
+  customer. **The overdraft is never used.**
+- A customer can **edit or cancel** a scheduled payment until a cut-off before it is due.
+- Every scheduled payment appears in a new **Upcoming payments** list.
+
+The exact rules, decisions and customer wording are in [business-rules.md](business-rules.md)
+(BR-1 to BR-17, D-1 to D-10, MSG-1 to MSG-12).
 
 ### Flow Diagram
 
@@ -57,7 +55,7 @@ flowchart LR
     A["Customer schedules rent<br/>monthly on the 1st"] --> B["Bank runs it on the day<br/>(next working day if a holiday)"]
     B --> C{"Enough money?"}
     C -->|yes| D["Paid, receipt sent"]
-    C -->|no| E["Retry at 6 pm"]
+    C -->|no| E["Retry later<br/>the same day"]
     E -->|now enough| D
     E -->|still short| F["Failed, customer told<br/>overdraft never used"]
     classDef new fill:#d4edda,stroke:#2e7d32,color:#000
@@ -76,12 +74,12 @@ flowchart LR
 
 **Acceptance criteria:**
 - From **Transfers → Schedule a payment**, the customer picks a from-account, a saved payee, an
-  amount and a date between tomorrow and 365 days ahead.
-- If the date is a weekend or bank holiday, the form shows "This payment will be made on
-  **Mon 2 Nov 2026**, the next working day." before the customer confirms.
-- After confirming, the customer sees "Payment scheduled" with a reference number, and the payment
-  appears in **Upcoming payments**.
-- Tapping **Confirm** twice creates only one scheduled payment.
+  amount and a date (BR-1, BR-2, BR-3).
+- If the date is a weekend or bank holiday, the form shows the adjusted date before the customer
+  confirms (BR-5, MSG-1).
+- After confirming, the customer sees a confirmation with a reference number (MSG-11), and the
+  payment appears in **Upcoming payments**.
+- Tapping **Confirm** twice creates only one scheduled payment (BR-17).
 
 ### US-2: Schedule a recurring payment
 
@@ -92,7 +90,7 @@ flowchart LR
 **Acceptance criteria:**
 - The customer chooses **Weekly** or **Monthly**, a first payment date, and an end: "After N
   payments", "On a date", or "Until I cancel".
-- A monthly payment on the 29th–31st is made on the last day of shorter months; the form says so.
+- A monthly payment on the 29th–31st follows BR-6; the form says so (MSG-2).
 - **Upcoming payments** shows the next payment date for each recurring schedule.
 
 ### US-3: Change or cancel a scheduled payment
@@ -102,10 +100,10 @@ flowchart LR
 **So that** I stay in control if my plans change.
 
 **Acceptance criteria:**
-- **Edit** and **Cancel** are available until 10 pm the evening before the payment date.
-- After the cut-off, the buttons are replaced by "This payment is being processed and can no
-  longer be changed."
-- Cancelling a recurring schedule asks: "Cancel only the next payment, or all future payments?"
+- **Edit** and **Cancel** are available until the cut-off (BR-10); after it, the buttons are
+  replaced by an explanation (MSG-6).
+- Cancelling a recurring schedule asks whether to cancel only the next payment or all future
+  payments (MSG-12).
 
 ### US-4: Be told what happened
 
@@ -114,11 +112,8 @@ flowchart LR
 **So that** I am never surprised by my balance or by an unpaid bill.
 
 **Acceptance criteria:**
-- Paid: push notification "Your payment of $400.00 to Ravi Kumar has been made."
-- Not enough money in the morning: push notification "We couldn't make your $400.00 payment to
-  Ravi Kumar yet because there isn't enough money in your account. We'll try again at 6 pm."
-- Failed after the retry: push notification **and** SMS "Your $400.00 payment to Ravi Kumar
-  couldn't be made because there wasn't enough money in your account."
+- The customer is told about every outcome (paid, waiting for funds, failed), and failures also
+  arrive by SMS (BR-15; wording MSG-3, MSG-4, MSG-9, MSG-10).
 
 ### US-5: Joint accounts
 
@@ -128,7 +123,7 @@ flowchart LR
 
 **Acceptance criteria:**
 - Both holders see all scheduled payments from the joint account.
-- Either holder can cancel. Only the holder who created a payment can edit it.
+- Either holder can cancel. Only the holder who created a payment can edit it (BR-11).
 
 ---
 
@@ -197,51 +192,10 @@ flowchart LR
 
 ---
 
-## Validation Rules
+## Business Rules and Decisions
 
-| Field | Rule | Default |
-|---|---|---|
-| From account | A savings or current account the customer holds (sole or joint), not frozen or closed | The customer's primary account |
-| Payee | A saved, verified payee of this customer | — |
-| Amount | Greater than $0.00, at most 2 decimal places, at most the customer's daily transfer limit | — |
-| First payment date | Tomorrow up to 365 days ahead | Tomorrow |
-| Repeat | Once, Weekly or Monthly | Once |
-| Ends (recurring) | After 2–120 payments, or on a date after the first payment, or until cancelled | Until cancelled |
-| Reference | Optional, up to 18 characters, letters, numbers and spaces | Empty |
-
----
-
-## Behavior Rules
-
-| Scenario | What User Sees |
-|---|---|
-| Date is a weekend or bank holiday | "This payment will be made on {date}, the next working day." before confirming |
-| Monthly on the 29th–31st | "Paid on the last day of shorter months" under the date |
-| Amount above the daily limit | "This is more than your daily transfer limit of $5,000.00." |
-| Not enough money at the morning run | Push: "…We'll try again at 6 pm." Status: **Waiting for funds** |
-| Still not enough at 6 pm | Push + SMS: "…couldn't be made because there wasn't enough money in your account." Status: **Failed** |
-| Payment made | Push: "Your payment of {amount} to {payee} has been made." Status: **Paid** |
-| Edit or cancel after 10 pm the evening before | "This payment is being processed and can no longer be changed." |
-| Deleting a payee with scheduled payments | "You have 2 scheduled payments to Ravi Kumar. Deleting this payee will cancel them." [Cancel] [Delete payee] |
-| Account frozen or closed on the payment date | Push + SMS: "Your {amount} payment to {payee} couldn't be made. Please contact us." Status: **Failed** |
-| A recurring payment fails | Only that payment fails; the next one is still scheduled |
-
----
-
-## Resolved Design Decisions
-
-| # | Decision | Resolution |
-|---|---|---|
-| 1 | Weekend or bank holiday | Next working day, shown to the customer before confirming |
-| 2 | Monthly on the 29th–31st | Last day of shorter months |
-| 3 | Not enough money | One retry at 6 pm the same day, then failed. The overdraft is never used |
-| 4 | Cut-off for changes | 10 pm the evening before the payment date |
-| 5 | Payee deleted with payments pending | Customer is warned first; confirming cancels those payments |
-| 6 | Joint accounts | Either holder can cancel; only the creator can edit |
-| 7 | Daily transfer limit | Checked when scheduling and again on the payment date |
-| 8 | One failure in a recurring schedule | Does not stop later payments |
-| 9 | Notifications | Push for every outcome; SMS added for failures |
-| 10 | Existing branch standing orders | Unchanged; not shown in the app in v1 |
+Validation rules, behaviour rules, the 10 resolved decisions and all customer wording live in
+[business-rules.md](business-rules.md).
 
 ---
 
@@ -263,7 +217,7 @@ None.
 
 - **Mobile and web app:** new Schedule a payment form and Upcoming payments list under Transfers.
 - **Payees:** deleting a payee now warns about and cancels scheduled payments to them.
-- **Overnight processing:** a new payment run after the end-of-day batch, and a 6 pm retry run.
+- **Overnight processing:** a new payment run after the end-of-day batch, and a same-day retry run.
 - **Notifications:** new push and SMS messages using the existing notification service.
 - **Operations:** a new alert when the payment network is unavailable during a run.
 - **Audit:** every scheduled payment status change appears in the account audit history.
@@ -284,7 +238,7 @@ None.
 | Question | Answer |
 |---|---|
 | Who can use this? | Retail customers with a savings or current account, in the mobile and web app |
-| Will a scheduled payment ever put me into overdraft? | No. If the balance isn't enough, the payment waits, retries at 6 pm, then fails |
+| Will a scheduled payment ever put me into overdraft? | No. If the balance isn't enough, the payment waits, retries later that day, then fails (BR-7, BR-8) |
 | When exactly does the money leave? | Early on the payment date, after the bank's overnight processing |
 | Can support staff see scheduled payments? | Yes, read-only, in the existing customer view in the back office |
 | What happens to my existing branch standing orders? | Nothing. They keep running as today |
