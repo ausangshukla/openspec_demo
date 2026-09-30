@@ -66,16 +66,16 @@ same payment twice.
 
 ### Requirement: Insufficient funds
 The system SHALL NOT use an overdraft for a scheduled payment. When the available balance, excluding
-any overdraft, does not cover a due payment, the system SHALL retry once at 6 pm the same day and
+any overdraft, does not cover a due payment, the system SHALL retry once at 8 pm the same day and
 SHALL fail the payment if the balance still does not cover it.
 
 #### Scenario: Retry succeeds
-- **WHEN** the morning run finds too little money and enough arrives before 6 pm
-- **THEN** the customer is told "We'll try again at 6 pm"
-- **AND** the 6 pm retry makes the payment
+- **WHEN** the morning run finds too little money and enough arrives before 8 pm
+- **THEN** the customer is told "We'll try again at 8 pm"
+- **AND** the 8 pm retry makes the payment
 
 #### Scenario: Still short after retry
-- **WHEN** the balance still does not cover the payment at 6 pm
+- **WHEN** the balance still does not cover the payment at 8 pm
 - **THEN** the payment status is "failed"
 - **AND** the customer receives a push notification and SMS explaining there wasn't enough money
 

@@ -32,7 +32,7 @@
 
 ## 3. Funds short, retry and notify
 
-- [ ] 3.1 Route insufficient funds on attempt 1 to `awaiting_funds` and create `InsufficientFundsRetryJob` (18:00 cron, attempt 2 fails the payment); verify in `rails runner` with a $300.00 balance · *Decision Flows*
+- [ ] 3.1 Route insufficient funds on attempt 1 to `awaiting_funds` and create `InsufficientFundsRetryJob` (20:00 cron, attempt 2 fails the payment); verify in `rails runner` with a $300.00 balance · *Decision Flows*
 - [ ] 3.2 Add the customer notification templates (paid, waiting for funds, failed, account unavailable) using `CustomerNotifier`, with SMS only on failures and masked account numbers; verify the rendered text matches business-rules.md MSG-3, MSG-4, MSG-9 and MSG-10 verbatim · *Exception Handling and Monitoring*
 - [ ] 3.3 Make a failed occurrence still plan the next one for recurring schedules; verify with the H3 rent schedule · *State Transitions*
 - [ ] 3.4 Write `features/payments/scheduled_transfers/retry.feature` covering worked examples H4, E4, E10, X1. Run `TEST_ENV_NUMBER=$RANDOM bundle exec cucumber features/payments/scheduled_transfers/retry.feature` and confirm it passes before starting phase 4

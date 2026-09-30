@@ -32,7 +32,7 @@
 | BR-5 | A payment due on a weekend or bank holiday is made on the next working day, and the customer sees the adjusted date before confirming. | Timing | Operations | D-1 | MSG-1 |
 | BR-6 | A monthly payment set for the 29th–31st is made on the last day of shorter months, and returns to its original day in longer months. | Timing | Product | D-2 | MSG-2 |
 | BR-7 | A scheduled payment never uses the overdraft: only the balance excluding any overdraft counts. | Funds | Risk | Lending policy; D-3 | — |
-| BR-8 | If the balance does not cover a payment at the morning run, it is retried once at 6 pm the same day, then fails. | Funds | Product | D-3 | MSG-3, MSG-4 |
+| BR-8 | If the balance does not cover a payment at the morning run, it is retried once at 8 pm the same day, then fails. | Funds | Product | D-3 | MSG-3, MSG-4 |
 | BR-9 | The amount is above $0.00, has at most 2 decimal places, and is within the daily transfer limit, checked when scheduling and again on the payment date. | Limits | Risk | Transfer limits policy; D-7 | MSG-5 |
 | BR-10 | A customer can edit or cancel a payment until 10 pm the evening before it is due; after that it cannot be changed. | Changes | Operations | D-4 | MSG-6 |
 | BR-11 | Every holder of a joint account sees its scheduled payments; any holder can cancel one; only the holder who created it can edit it. | Changes | Product | D-6 | MSG-7 |
@@ -51,7 +51,7 @@
 |---|---|---|---|---|---|
 | D-1 | Due date is a weekend or bank holiday? | Next working day, shown before confirming | Payments don't settle on non-working days; customers must know the real date | Previous working day: takes money earlier than asked | Product, Operations |
 | D-2 | Monthly on the 29th–31st? | Last day of shorter months, back to the original day after | Customers expect "month-end rent" to land every month | Skip the month: a missed rent payment | Product |
-| D-3 | Not enough money on the day? | One retry at 6 pm the same day, then fail. The overdraft is never used | Many salaries arrive during the day; using the overdraft would create borrowing and fees the customer didn't ask for | Use the arranged overdraft: rejected by Risk as unconsented borrowing | Risk, Product |
+| D-3 | Not enough money on the day? | One retry at 8 pm the same day, then fail. The overdraft is never used | Changed from 6 pm: late salary credits land up to 19:30. Many salaries arrive during the day; using the overdraft would create borrowing and fees the customer didn't ask for | Use the arranged overdraft: rejected by Risk as unconsented borrowing | Risk, Product |
 | D-4 | Cut-off for changes? | 10 pm the evening before the payment date | End-of-day processing starts at 10:30 pm; later changes can't be guaranteed | Until the run starts: cancellation could silently fail | Operations |
 | D-5 | Payee deleted with payments pending? | Warn first; confirming cancels those payments | Customers shouldn't lose payments without knowing | Block payee deletion: poor experience | Product |
 | D-6 | Joint accounts: who can change a payment? | Any holder can cancel; only the creator can edit | Either holder must be able to stop money leaving; only the creator should redirect it | Any holder edits: one holder could redirect the other's payment | Product, Risk |
@@ -82,7 +82,7 @@
 |---|---|---|---|
 | MSG-1 | The chosen date is a weekend or bank holiday | "This payment will be made on {date}, the next working day." | Form |
 | MSG-2 | A monthly day of 29–31 is chosen | "Paid on the last day of shorter months" | Form |
-| MSG-3 | Not enough money at the morning run | "We couldn't make your {amount} payment to {payee} yet because there isn't enough money in your account. We'll try again at 6 pm." | Push |
+| MSG-3 | Not enough money at the morning run | "We couldn't make your {amount} payment to {payee} yet because there isn't enough money in your account. We'll try again at 8 pm." | Push |
 | MSG-4 | Still not enough at the retry | "Your {amount} payment to {payee} couldn't be made because there wasn't enough money in your account." | Push + SMS |
 | MSG-5 | Amount above the daily limit | "This is more than your daily transfer limit of {limit}." | Form |
 | MSG-6 | Edit or cancel after the cut-off | "This payment is being processed and can no longer be changed." | Screen |

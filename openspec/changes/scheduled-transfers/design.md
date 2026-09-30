@@ -68,7 +68,7 @@ flowchart LR
     end
     subgraph SCHED["Scheduling boundary"]
         Eod[["EOD batch completed event"]]
-        Cron[["18:00 retry cron / 15-min reconcile cron"]]
+        Cron[["20:00 retry cron / 15-min reconcile cron"]]
         Jobs["Run, retry and reconcile jobs"]
     end
     subgraph DOMAIN["Domain boundary (new pack)"]
@@ -312,8 +312,8 @@ stateDiagram-v2
     scheduled --> processing: morning run, funds cover it
     scheduled --> awaiting_funds: morning run, funds short
     scheduled --> failed: account frozen or closed / over daily limit
-    awaiting_funds --> processing: 18:00 retry, funds cover it
-    awaiting_funds --> failed: 18:00 retry, still short
+    awaiting_funds --> processing: 20:00 retry, funds cover it
+    awaiting_funds --> failed: 20:00 retry, still short
     processing --> completed: network confirms
     processing --> failed: network rejects (debit reversed)
     processing --> processing: timeout, reconcile pending
@@ -390,7 +390,7 @@ sequenceDiagram
     Runner->>Notif: "payment has been made" (push)
 ```
 
-**Funds short, then 18:00 retry**
+**Funds short, then 20:00 retry**
 
 ```mermaid
 sequenceDiagram
@@ -403,8 +403,8 @@ sequenceDiagram
     Job->>Runner: run(execution, attempt 1)
     Runner->>DB: balance 300.00 < 400.00
     Runner->>DB: status awaiting_funds, attempts 1, audit
-    Runner->>Notif: "we'll try again at 6 pm" (push)
-    Note over Retry: 18:00 same business day
+    Runner->>Notif: "we'll try again at 8 pm" (push)
+    Note over Retry: 20:00 same business day
     Retry->>Runner: run(execution, attempt 2)
     alt balance now covers it
         Runner->>DB: debit + outbox + audit (as happy path)
@@ -465,7 +465,7 @@ business-rules.md) the row proves; — marks an engineering-only case.
 | H1 | One-off scheduled | Shared setup | Asha schedules $400.00 to Ravi Kumar from ••4821 for Thu 15 Oct 2026 | Execution `scheduled`, due 15 Oct; "Payment scheduled" with reference; listed in Upcoming | BR-1, BR-2, BR-3 | One-off transfer scheduled | scheduling |
 | H2 | Payment made | H1; balance $2,500.00 on 15 Oct | EOD completes, run starts; network confirms | Debited once; `completed`; balance $2,100.00; push "…has been made" | BR-15 | Payment made | execution |
 | H3 | Rent rolls forward | Monthly $1,200.00 to Ravi, day 1, until cancelled | Run on Mon 2 Nov (1 Nov is a Sunday) completes | Paid 2 Nov; next execution nominal 1 Dec, due Tue 1 Dec, `scheduled` | BR-4, BR-5 | Recurring monthly transfer scheduled · Recurring schedule rolls forward | execution |
-| H4 | Retry succeeds | H1; balance $300.00 on 15 Oct morning | Salary $3,000.00 arrives 14:00; 18:00 retry | `awaiting_funds` then `completed`; push "try again at 6 pm" then "…has been made" | BR-8, BR-15 | Retry succeeds | retry |
+| H4 | Retry succeeds | H1; balance $300.00 on 15 Oct morning | Salary $3,000.00 arrives 14:00; 20:00 retry | `awaiting_funds` then `completed`; push "try again at 8 pm" then "…has been made" | BR-8, BR-15 | Retry succeeds | retry |
 | H5 | Transitions audited | H2 | Audit history of ••4821 is viewed | Two entries: scheduled→processing (actor: payment run), processing→completed (actor: network confirmation) | BR-16 | Status change audited | audit |
 
 #### Edge Cases
@@ -487,7 +487,7 @@ business-rules.md) the row proves; — marks an engineering-only case.
 
 | # | Scenario | Given | When | Then (what the user sees, who is alerted) | Rule | Spec scenario | Feature |
 |---|---|---|---|---|---|---|---|
-| X1 | Still short after retry | H1; balance $300.00 all day | 18:00 retry | `failed`, reason insufficient_funds; push + SMS "…couldn't be made because there wasn't enough money…"; no debit | BR-8, BR-15 | Still short after retry | retry |
+| X1 | Still short after retry | H1; balance $300.00 all day | 20:00 retry | `failed`, reason insufficient_funds; push + SMS "…couldn't be made because there wasn't enough money…"; no debit | BR-8, BR-15 | Still short after retry | retry |
 | X2 | Timeout after debit | H2, but network times out after send | Reconcile 15 min later: network says settled / not found | Settled → `completed`. Not found → reversal credit $400.00, `failed`, push. Never resent under a new reference | — | Timeout after debit | execution |
 | X3 | Network down | Network refuses connections from 02:10 | 15 minutes pass | Ops alerted once; executions stay `processing` with outbox pending; sent on recovery | — | Network unavailable | audit |
 | X4 | Frozen account | ••4821 frozen on 14 Oct | Run on 15 Oct | `failed`, reason account_unavailable; push + SMS "…Please contact us." | BR-14 | Frozen account on the payment date | execution |
@@ -505,7 +505,7 @@ business-rules.md) the row proves; — marks an engineering-only case.
 | `ExecutionRunner` | Claim, checks, debit + outbox + audit in one transaction | Idempotent by `idempotency_key`; notifications after commit |
 | `NextExecutionPlanner` | Create the next execution when one finishes | Unique `[scheduled_transfer_id, sequence]` makes it safe to call twice |
 | `ScheduledPaymentRunJob` | Run all executions due on the business date | Queue `:payments`; triggered by EOD event; 04:00 safety cron |
-| `InsufficientFundsRetryJob` | Second attempt for `awaiting_funds` | Cron 18:00 |
+| `InsufficientFundsRetryJob` | Second attempt for `awaiting_funds` | Cron 20:00 |
 | `ExecutionReconcileJob` | Resolve `processing` older than 15 min | Cron every 15 min; queries network by reference |
 
 ### Decision Flows
@@ -665,15 +665,15 @@ attempt and the failure reason in plain words.
 
 | Question | Answer |
 |---|---|
-| Could the run and the 18:00 retry both debit the same payment? | Both must win `claim!`, which only succeeds from `scheduled` or `awaiting_funds`; the ledger also rejects a second posting with the same key |
+| Could the run and the 20:00 retry both debit the same payment? | Both must win `claim!`, which only succeeds from `scheduled` or `awaiting_funds`; the ledger also rejects a second posting with the same key |
 | Why lock the account row? | Two payments from one account in the same run must see each other's debits when checking the balance |
 
 ### Exception Handling and Monitoring
 
 | Failure scenario | Who is alerted | Channel | Detail |
 |---|---|---|---|
-| Funds short at morning run | Customer | Push | "We'll try again at 6 pm" |
-| Funds short at 18:00 | Customer | Push + SMS | Payment failed |
+| Funds short at morning run | Customer | Push | "We'll try again at 8 pm" |
+| Funds short at 20:00 | Customer | Push + SMS | Payment failed |
 | Account frozen / closed | Customer | Push + SMS | "Please contact us" |
 | Network rejects a payment | Customer | Push | Debit reversed, payment failed |
 | Network unreachable > 15 min | Operations | Existing on-call alerting | Once per outage; cleared on recovery |
@@ -727,7 +727,7 @@ tag). New step file `scheduled_transfer_steps.rb`; account, payee and notificati
   keeps it correct if EOD is still posting.
 - Bank holiday calendar is wrong or missing a year → reuse the existing calendar, which operations
   already maintain; add a startup check that next year's calendar is loaded.
-- Many customers are paid on the same day as rent is due → the 18:00 retry exists for this; the
+- Many customers are paid on the same day as rent is due → the 20:00 retry exists for this; the
   customer wording (MSG-3) tells customers about the retry.
 
 | # | Open question | Current thinking | Status |
