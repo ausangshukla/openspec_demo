@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aligned by Design</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400..700;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+*{margin:0;box-sizing:border-box}
+html,body{height:100%;background:#0B1220;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+.slide{position:absolute!important;left:0;top:0;width:1920px;height:1080px;overflow:hidden}
+.hidden{display:none!important}
+aside{display:none}
+ul,ol{padding-left:36px}
+table{border-collapse:collapse;width:100%}
+th,td{padding:.35em .6em;border-bottom:1px solid #DDD8CC;text-align:left;vertical-align:top}
+th{font-weight:600}
+x-connector{display:flex;align-items:center;justify-content:center;flex:none}
+x-connector::after{content:"\2192";font-size:36px;line-height:1}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:40vh;overflow:auto;background:#F7F5F0;color:#14233B;font:16px/1.5 "IBM Plex Sans",Arial,sans-serif;padding:16px 24px;border-top:3px solid #1F6F78;display:none}
+#count{position:fixed;right:12px;top:8px;color:#8A97AB;font:13px Arial,sans-serif}
+</style></head><body>
+<div id="stage">
+<section class="slide" id="cover" data-transition="fade" style="background:#14233B;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9;letter-spacing:1px;text-transform:uppercase">Spec-driven development with OpenSpec</p>
+<div style="display:flex;flex-direction:column;gap:36px">
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:128px;font-weight:600;line-height:1.02;color:#F2EFE8">Aligned by design</h1>
+<p style="font-size:36px;line-height:1.4;color:#B8C2D0;width:1400px">How OpenSpec aligns the business, the engineering team, the developer and AI on one agreed picture of a feature, shown on a worked banking example.</p>
+</div>
+<div style="display:flex;gap:48px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#F2EFE8">Part 1 · The case</p>
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#8A97AB">Part 2 · Live demo</p>
+</div>
+<aside>This talk is about getting four parties, one of them an AI, to share one picture of a feature. Alignment doesn't come from more meetings; it comes from a small set of documents that every party, the AI included, helps shape, challenges and signs. Shape of the talk: the problem, how each OpenSpec document creates alignment with the AI probing us at each step, how it stays aligned when things change, traceability from agreement to test, costs, then a live demo.</aside>
+</section>
+<section class="slide hidden" id="funnel" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">A real feature · the map</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">From one line to one agreed picture</h2>
+</div>
+<div style="display:flex;gap:40px;align-items:stretch">
+<div style="flex:2;display:flex;flex-direction:column;justify-content:center;gap:20px;background:#14233B;padding:48px;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9">THE TICKET</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:48px;line-height:1.2;color:#F2EFE8">“Let customers schedule payments.”</p>
+</div>
+<x-connector style="width:56px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<div style="flex:3;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-direction:column;gap:4px;background:#FDFCF9;padding:16px 28px;border-left:6px solid #1F6F78;border-radius:4px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Proposal <span style="color:#6B7280">· slide 8</span></h3><p style="font-size:24px;line-height:1.4;color:#4A5568">Why · 5 user stories · 7 exclusions · impact</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FDFCF9;padding:16px 28px;border-left:6px solid #A0621A;border-radius:4px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Business rules <span style="color:#6B7280">· slide 9</span></h3><p style="font-size:24px;line-height:1.4;color:#4A5568">17 rules · 10 decisions · 12 messages · each with an owner</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FDFCF9;padding:16px 28px;border-left:6px solid #1F6F78;border-radius:4px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Design <span style="color:#6B7280">· slides 10–11</span></h3><p style="font-size:24px;line-height:1.4;color:#4A5568">21 H/E/X cases · 5 decisions · security, alerts, transactions</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FDFCF9;padding:16px 28px;border-left:6px solid #1F6F78;border-radius:4px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Tasks <span style="color:#6B7280">· slide 12</span></h3><p style="font-size:24px;line-height:1.4;color:#4A5568">26 steps in 4 phases, each ending in a gate</p></div>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.45;color:#14233B">Every item was a question someone had to answer. OpenSpec makes sure each one is asked, answered by the right party, and written where the AI will read it.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">Counts from openspec/changes/scheduled-transfers/</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">2</p>
+<aside>This is the kind of ticket we all see. It says nothing about bank holidays, the 31st of a 30-day month, or what happens when the network times out after the money has left. Before this feature could be built correctly, all of this had to be decided: the proposal's why, 5 user stories and 7 exclusions; the business rules' 17 rules, 10 decisions and 12 customer messages, each with an owner; 21 worked cases and 5 design decisions in the design; 26 tasks in 4 gated phases. This slide is the map: each box is opened up later, proposal on slide 8, business rules on 9, design on 10 and 11, tasks on 12. The templates help: every section must be filled in or marked N/A with a reason, so skipping something is a visible decision, not an accident.</aside>
+</section>
+<section class="slide hidden" id="four-parties" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">The starting point</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Every feature is now built by four parties</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FDFCF9;padding:32px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600">The business</h3>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">Product, risk, operations. Knows what the customer needs and which rules apply.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FDFCF9;padding:32px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600">The engineering teams</h3>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">Development, architecture, security, QA. Know how the systems fit and hold.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FDFCF9;padding:32px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600">The developer</h3>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">Owns the change. Directs the AI and answers for the result.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FDFCF9;padding:32px;border-top:6px solid #A0621A;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600">The AI</h3>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">Writes much of the code. Knows only what it is given to read.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;border-left:6px solid #14233B;padding:8px 0 8px 32px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:40px;line-height:1.3;color:#14233B">Where does their shared picture of the feature live?</p>
+<p style="font-size:28px;line-height:1.45;color:#4A5568">Today: in meetings, tickets, chat threads and people's memory. None of it is versioned, reviewable as a whole, or readable by the AI.</p>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">3</p>
+<aside>Frame the problem neutrally. Three of these parties have always existed; the AI is new, and it differs in one important way: it has no memory of meetings and no hallway context. It works only from what is written down and given to it. Example: the decision that a scheduled payment must never use the overdraft might be made in a risk meeting. If it isn't written somewhere the AI reads, then as far as the AI is concerned, it doesn't exist.</aside>
+</section>
+<section class="slide hidden" id="alignments" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">What alignment means</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Four alignments, each covering happy, edge and error cases</h2>
+</div>
+<table style="font-size:24px;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:21%;text-align:left">Between</th><th style="width:27%;text-align:left">They must agree on</th><th style="width:36%;text-align:left">Happy · Edge · Error (from the demo)</th><th style="width:16%;text-align:left">Signed by</th></tr>
+<tr><td><b>Business ↔ Tech</b><br>proposal + rules</td><td>What we're solving, why, and what we won't do</td><td><b style="color:#1F6F78">H</b> rent paid on the 1st<br><b style="color:#A0621A">E</b> due date is a bank holiday<br><b style="color:#9B2C2C">X</b> not enough money on the day</td><td>Business: product, risk, compliance</td></tr>
+<tr><td><b>Engineering teams</b><br>design</td><td>How it's built; that it fits, is secure, and is testable</td><td><b style="color:#1F6F78">H</b> overnight run debits and sends<br><b style="color:#A0621A">E</b> the run starts twice<br><b style="color:#9B2C2C">X</b> network times out after the debit</td><td>Dev, architecture, security, QA</td></tr>
+<tr><td><b>Developer ↔ AI</b><br>tasks</td><td>What gets built, in what order, verified how</td><td>Every H, E and X case becomes a test that must pass at a phase gate: 21 in all</td><td>The developer, at each gate</td></tr>
+</table>
+<div style="display:flex;gap:32px">
+<div style="flex:1;border-left:6px solid #A0621A;padding:4px 0 4px 24px"><p style="font-size:26px;line-height:1.4;color:#14233B"><b>Most misunderstandings live in E and X.</b> Everyone agrees on the happy path.</p></div>
+<div style="flex:1;border-left:6px solid #14233B;padding:4px 0 4px 24px"><p style="font-size:26px;line-height:1.4;color:#14233B"><b>Everyone ↔ AI:</b> the AI reads the agreed cases every session and builds them, rather than inventing its own.</p></div>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">4</p>
+<aside>Alignment is four specific agreements, and each covers not just the happy path but the edge and error cases. H is the happy path, where everything goes as expected. E is an edge case: unusual but legitimate, like a holiday, the 31st, or a double tap. X is an error case: something fails, like no money, a frozen account, or a network timeout. Most misunderstandings live in E and X; everyone agrees on the happy path. Notice who owns which cases: the business decides the customer-facing ones (a holiday? no money?), the engineering teams decide the system ones (the job runs twice? the network times out?), and the developer and the AI agree that every case is tested before moving on. Example: everyone agrees rent should be paid on the 1st. The alignment work is agreeing what happens when the payment date is a bank holiday, when there isn't enough money, and when the network times out after the money has left. In the demo those are cases E1, X1 and X2, each signed and each a test.</aside>
+</section>
+<section class="slide hidden" id="insight" data-transition="fade" style="background:#1F6F78;color:#F7F5F0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:48px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#F7F5F0;letter-spacing:1px;text-transform:uppercase">The core idea</p>
+<div style="display:flex;flex-direction:column;gap:28px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:80px;font-weight:600;line-height:1.15;color:#F7F5F0">Alignment isn't a meeting.</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:80px;font-weight:600;line-height:1.15;color:#F7F5F0">It's a set of documents every party, the AI included, helps shape, challenges and signs.</p>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#DCEBEC;text-align:right">5</p>
+<aside>Meetings create a feeling of alignment that fades, and the AI can't read it. Documents that are probed, reviewed and signed create alignment that lasts, can be checked, and are the AI's actual input.</aside>
+</section>
+<section class="slide hidden" id="probe" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">How every document is made</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Inputs in, questions out, one organised document</h2>
+</div>
+<div style="display:flex;align-items:end">
+<div style="width:240px"></div>
+<p style="flex:1;font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">INPUTS</p>
+<div style="width:40px"></div>
+<p style="flex:1;font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">THE AI ASKS</p>
+<div style="width:40px"></div>
+<p style="flex:1;font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">ORGANISED INTO</p>
+</div>
+<div style="display:flex;align-items:stretch">
+<div style="width:240px;display:flex;flex-direction:column;justify-content:center;gap:2px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Proposal</h3><p style="font-size:24px;color:#1F6F78">sponsor signs</p></div>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FDFCF9;border:1px solid #DDD8CC;padding:18px 22px;border-radius:6px;color:#4A5568">Conversations, notes, docs, code</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#F3E4CC;padding:18px 22px;border-radius:6px;color:#14233B">What problem? For whom? What's out?</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#DCEBEC;padding:18px 22px;border-radius:6px;color:#14233B">Why · stories · screens · scope</p>
+</div>
+<div style="display:flex;align-items:stretch">
+<div style="width:240px;display:flex;flex-direction:column;justify-content:center;gap:2px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Business rules</h3><p style="font-size:24px;color:#1F6F78">product, risk, compliance</p></div>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FDFCF9;border:1px solid #DDD8CC;padding:18px 22px;border-radius:6px;color:#4A5568">Policies, regulations, product rules</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#F3E4CC;padding:18px 22px;border-radius:6px;color:#14233B">Owner? Source? Exceptions? Wording?</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#DCEBEC;padding:18px 22px;border-radius:6px;color:#14233B">Rules · decisions · customer wording</p>
+</div>
+<div style="display:flex;align-items:stretch">
+<div style="width:240px;display:flex;flex-direction:column;justify-content:center;gap:2px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Design</h3><p style="font-size:24px;color:#1F6F78">engineering teams</p></div>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FDFCF9;border:1px solid #DDD8CC;padding:18px 22px;border-radius:6px;color:#4A5568">Proposal, rules, guidelines, stack, code</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#F3E4CC;padding:18px 22px;border-radius:6px;color:#14233B">Runs twice? Timeout? Who's alerted?</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#DCEBEC;padding:18px 22px;border-radius:6px;color:#14233B">Structure · H/E/X cases · patterns</p>
+</div>
+<div style="display:flex;align-items:stretch">
+<div style="width:240px;display:flex;flex-direction:column;justify-content:center;gap:2px"><h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:32px;font-weight:600">Tasks</h3><p style="font-size:24px;color:#1F6F78">developer approves</p></div>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#FDFCF9;border:1px solid #DDD8CC;padding:18px 22px;border-radius:6px;color:#4A5568">Design, UI and CSS standards, patterns, house rules</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#F3E4CC;padding:18px 22px;border-radius:6px;color:#14233B">Which order? How verified? Where to stop?</p>
+<x-connector style="width:40px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:26px;line-height:1.35;background:#DCEBEC;padding:18px 22px;border-radius:6px;color:#14233B">Phases · citations · gates</p>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">People answer the questions. Each signed document feeds the next.</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">6</p>
+<aside>Every document is made the same way: inputs in, questions out, answers organised into a document with a fixed structure, then signed. The slide shows the short version; here is the detail. Proposal: inputs are conversations, meeting notes such as Zoom transcripts, existing documents and code; the probing is explore, where the problem gets tightened; it's organised into a high-level proposal, why, stories, screens, scope, and the business sponsor signs. Business rules: inputs are the proposal, bank policies and regulations, product rules and what the system does today; the AI asks who owns each rule, which policy says so, what the exceptions are, and exactly what the customer sees; it's organised into a rule catalogue, decisions and customer wording, and product, risk, compliance and operations sign. Design: inputs are the proposal and rules, architecture, security and QA guidelines, the stack and best practices, and existing code; the AI asks what if the run starts twice, a timeout after the debit, who is alerted, does it fit around end-of-day; the engineering teams sign. Tasks: inputs are the signed design, the LLD and QA checklist, UI design guidelines and CSS standards, the patterns to use, house rules, and existing code and tests; the AI asks in what order, how each step is verified, where to stop, whether every case is gated; the developer approves. Three points: inputs are wide; people answer the questions; the template fixes the structure and each signed document feeds the next. Example: the AI read the meeting notes and the payments code, asked whether a scheduled payment may use the overdraft, risk said never, and that's now rule BR-7 and decision D-3.</aside>
+</section>
+<section class="slide hidden" id="div-close" data-transition="push" style="background:#14233B;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9;letter-spacing:1px;text-transform:uppercase">How it works</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:104px;font-weight:600;line-height:1.06;color:#F2EFE8">How each document aligns the parties</h1>
+<p style="font-size:36px;line-height:1.4;color:#B8C2D0;width:1350px">A complete OpenSpec change for a retail bank: scheduled and recurring transfers. Everything that follows is quoted from it.</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#8A97AB;text-align:right">7</p>
+<aside>The demo change lives in openspec/changes/scheduled-transfers/.</aside>
+</section>
+<section class="slide hidden" id="ex-proposal" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">proposal.md · business ↔ tech</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">The proposal, broken open: the high-level agreement</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">1 · THE PROBLEM</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Why, and what changes</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Before/after flows: remember rent or visit a branch → schedule once, the bank does the rest</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">2 · THE PEOPLE</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">User stories and screens</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">5 stories with acceptance criteria · mockups of “Schedule a payment” and “Upcoming payments”</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">3 · SCOPE</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">What we will not do</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">7 exclusions: no international · no credit-card source · fixed amounts only · no business accounts…</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">4 · IMPACT</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">What it touches, benefits</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">App, payees, overnight processing, notifications, operations · 4 customer benefits</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">5 · FAQ AND POINTERS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Questions, rule IDs</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">The FAQ support will ask · details referenced by ID (BR, D, MSG) → next slide</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#14233B;padding:28px;border-top:6px solid #7CC3C9;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9">AI + BUSINESS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600;color:#F2EFE8">Probed, reflected, signed</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8C2D0">The AI probes the idea (explore) and reflects back what's in and out. The sponsor signs.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From openspec/changes/scheduled-transfers/proposal.md</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">8</p>
+<aside>The proposal is the high-level agreement between business and tech: what, why, for whom, and what not. It deliberately leaves the detailed rules to the next document. Walk the five boxes. 1, the problem: why and what changes, with before/after flows; today customers must remember rent on the 1st or visit a branch, afterwards they schedule once. 2, the people: 5 user stories with acceptance criteria, and mockups of the two screens. 3, scope: 7 exclusions, like no international transfers and no credit-card source accounts, each saying where it goes instead. 4, impact and benefits: what it touches, the app, payees, overnight processing, notifications, operations, and 4 customer benefits. 5, the FAQ support and operations will ask, and every detailed rule, decision and message referenced by ID, living in the business rules. The AI probes the idea, this is explore, reflects back what's in and out of scope, and the business sponsor signs. Example: the proposal says if there isn't enough money the bank tries again later that day and never uses the overdraft; when it retries, and why the overdraft is excluded, are rules BR-7 and BR-8 in the next document.</aside>
+</section>
+<section class="slide hidden" id="ex-rules" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">business-rules.md · the business teams</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Business rules, broken open: one place, every rule</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">1 · RULE CATALOGUE</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">17 rules, owner and source</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">BR-7: “A scheduled payment never uses the overdraft” · Risk · lending policy</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">2 · DECISIONS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">10 decisions, with rationale</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">D-3: retry once at 6 pm, then fail. Using the overdraft: rejected by Risk</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">3 · INPUT VALIDATION</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Every field, tied to a rule</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Amount → BR-9 → MSG-5 · First date → BR-3, BR-5 → MSG-1</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">4 · CUSTOMER WORDING</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">12 messages, word for word</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">MSG-5: “This is more than your daily transfer limit of {limit}.” QA checks verbatim</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">5 · PROVEN</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Every rule has a case</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Design cases cite rule IDs: 17 of 17 proven. BR-7 → case E4, overdraft not used</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#14233B;padding:28px;border-top:6px solid #7CC3C9;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9">AI + BUSINESS OWNERS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600;color:#F2EFE8">Probed, reflected, signed</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8C2D0">Owner? Source? Exceptions? Wording? Product, risk, compliance, operations sign.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From openspec/changes/scheduled-transfers/business-rules.md</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">9</p>
+<aside>Business rules and decisions get their own document: the single place where every rule, decision and customer message lives, each with an ID, an owner and a source. This is where product, risk, compliance and operations align with each other and with tech. 1, rule catalogue: 17 rules, each one testable sentence, like BR-7, a scheduled payment never uses the overdraft, owned by Risk, from the lending policy. 2, decisions: 10, each with rationale and the alternatives rejected, like D-3, retry once at 6 pm then fail, with the overdraft option rejected by Risk as unconsented borrowing. 3, input validation: every field's rule and default, tied back to a rule ID. 4, customer wording: 12 messages word for word, the only place they're defined; QA checks each verbatim. 5, proven: the design's worked examples cite rule IDs, and all 17 rules are proven by at least one case; BR-7 is proven by E4. The AI reads the proposal, the policies and today's behaviour, probes for each rule's owner, source, exceptions and exact wording, reflects back a summary to confirm, and each owning role signs. Why separate: rules change more often than the proposal and have different owners; the 8 pm change touched this document and never touched the proposal. Example: an auditor asks who decided scheduled payments never use the overdraft and why: D-3, decided by Risk and Product, with the rationale and the rejected alternative written down, and BR-7 proven by test E4.</aside>
+</section>
+<section class="slide hidden" id="ex-design" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">design.md · engineering teams</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">The design, broken down until nothing is implied</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">1 · STRUCTURE</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Components and sequence diagrams</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Boundaries, classes, data, state lifecycle, sequences: 13 diagrams. Does it fit the architecture?</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">2 · COVERAGE</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Happy, edge and error cases</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">5 H · 10 E · 6 X. E1 bank holiday · E9 run starts twice · X2 timeout after the debit</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">3 · PRECISION</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Worked examples</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Given / When / Then with real data: “Asha schedules $400.00 to Ravi for 15 Oct.” One test each</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">4 · PATTERNS &amp; ORTHOGONAL</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">What nobody asks for</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Run after end-of-day · outbox · idempotency key · transactions · alerts · authorization</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">5 · STANDARDS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Best practices, house rules</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Cents, never floats · no network call mid-transaction · masked account numbers · audit · reuse</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#14233B;padding:28px;border-top:6px solid #7CC3C9;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9">AI + ENGINEERING TEAMS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600;color:#F2EFE8">Probed, reflected, signed</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8C2D0">The AI probes each box and lists what's covered or N/A. Every team signs (next slide).</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From openspec/changes/scheduled-transfers/design.md</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">10</p>
+<aside>Walk the five boxes. 1, structure: component boundaries, class diagram, data model, the payment's state lifecycle, and sequence diagrams for the happy path, the funds-short retry and the timeout, 13 diagrams in all. This is where the engineering teams check it fits the architecture and doesn't disturb other moving parts. 2, coverage: 5 happy, 10 edge and 6 error cases; the AI probes hardest here. 3, precision: every case as Given/When/Then with real data, one automated test each. 4, patterns and orthogonal concerns: start the run when end-of-day processing completes (EOD sometimes runs late and a fixed time would collide with interest posting), a transactional outbox, one idempotency key per payment so it's never debited twice, plus transactions, alerts and authorization, each filled in or marked N/A with a reason. 5, standards: money in whole cents, no network call inside a database transaction, masked account numbers, every status change audited, reuse existing services. The AI probes each box and reflects back what's covered and what's N/A; development, architecture, security and QA each review and sign. Example: X2, a timeout after the money has left: check with the network 15 minutes later, complete or refund, and never resend under a new reference.</aside>
+</section>
+<section class="slide hidden" id="design-teams" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">design.md · engineering teams align</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">One design, reviewed by every engineering team</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Development</h3>
+<p style="font-size:24px;line-height:1.4;color:#14233B">The approach</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Classes, data model, 3 sequence diagrams</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #14233B;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Architecture</h3>
+<p style="font-size:24px;line-height:1.4;color:#14233B">Fit with other systems</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Run after end-of-day · outbox · reuse ledger and notifier</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #9B2C2C;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Security</h3>
+<p style="font-size:24px;line-height:1.4;color:#14233B">Access and data protection</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Only your own accounts · masked numbers · safe idempotency keys</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #A0621A;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">QA</h3>
+<p style="font-size:24px;line-height:1.4;color:#14233B">Testability</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">21 H/E/X cases, each one a test · QA checklist, same IDs</p>
+</div>
+</div>
+<div style="display:flex;gap:20px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px 28px;border-left:6px solid #1F6F78;border-radius:4px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Simple change: one design document</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">A section for each concern; each team reviews and signs its sections</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#14233B;padding:24px 28px;border-left:6px solid #7CC3C9;border-radius:4px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600;color:#F2EFE8">Complex change: one document per team</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8C2D0">architecture.md · security-review.md · test-plan.md, each signed by its team</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From openspec/changes/scheduled-transfers/design.md</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">11</p>
+<aside>The design is where the engineering teams align with each other. Development checks the approach: components, classes, data model, sequences. Architecture checks fit: boundaries, contracts, patterns, reuse, and impact on other systems; in the demo, running after end-of-day processing, the outbox, and reusing the existing ledger and notifier. Security checks authorization and data protection; in the demo, every lookup scoped to the customer's own accounts, account numbers masked, idempotency keys never derived from customer data. QA checks testability: 21 worked cases, each one a test, and a QA checklist with the same IDs. Without this, security finds the problem in a late review, architecture finds it in production, and QA finds it by guessing the cases. With it, all four sign the same design before code exists. Simple change: one design document with a section per concern. Complex change: specialised documents per team, like architecture.md, security-review.md and test-plan.md, each with its own template, probed by the AI and signed by its team; they're added the same way as the LLD and QA checklist. Example: security's question, can a customer schedule a payment from someone else's account? The design answers it, and worked example X6 turns the answer into a test.</aside>
+</section>
+<section class="slide hidden" id="ex-tasks" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">tasks.md · developer ↔ AI</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">The tasks, broken open: how the design becomes code</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">1 · ORDER</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Phases, by dependency</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">4 phases, 26 tasks: schedule → overnight run → retry and notify → audit and alerts</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">2 · CITATIONS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Every task cites the design</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">2.1 → “Pipeline / Flow” · 2.3 → “Decision Flows”. Review becomes a comparison</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">3 · VERIFICATION</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Every task says how it's proven</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">2.2: “two concurrent claims on one execution produce exactly one true”</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">4 · GATES</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Every phase ends in a test</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">2.7: tests for H2 H3 E9 X2 X4 must pass before phase 3. The AI stops for review</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FDFCF9;padding:28px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">5 · STANDARDS AND DOCS</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Built in, not bolted on</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">3.2: masked account numbers · 1.9: help page, wording checked against the business rules</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#14233B;padding:28px;border-top:6px solid #7CC3C9;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9">AI + DEVELOPER</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600;color:#F2EFE8">Reflected, approved, ticked</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8C2D0">The AI reflects back its plan; the developer approves. It ticks, stops at gates, resumes at the first open box.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From openspec/changes/scheduled-transfers/tasks.md</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">12</p>
+<aside>The tasks turn the agreed design into a build plan the developer approves and the AI follows step by step. Walk the five boxes. 1, order: 4 phases and 26 tasks in dependency order, schedule/edit/cancel, overnight run and debit, funds short retry and notify, audit and alerts; each phase builds on a tested one. 2, citations: every task names the design section it implements, like 2.1 citing Pipeline / Flow and 2.3 citing Decision Flows, so review becomes a comparison. 3, verification: every task says how it's proven done, like 2.2, two concurrent claims on one execution produce exactly one true; a tick means verified, not just written. 4, gates: every phase ends in a test that must pass; 2.7 covers H2, H3, E9, X2 and X4 and phase 3 can't start until they pass; the AI stops there for human review. 5, standards and docs: house rules are tasks too, like 3.2's masked account numbers, and documentation ships per phase, like 1.9's help page checked word for word against the business rules' customer wording. The AI reflects back its plan and confirms every worked case is gated; the developer approves; the AI ticks boxes, stops at gates, and after a restart resumes at the first unticked box. Nothing on the list is skipped; nothing off the list is built.</aside>
+</section>
+<section class="slide hidden" id="div-prove" data-transition="push" style="background:#14233B;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9;letter-spacing:1px;text-transform:uppercase">Proving it</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:104px;font-weight:600;line-height:1.06;color:#F2EFE8">Proving the code matches the agreement</h1>
+<p style="font-size:36px;line-height:1.4;color:#B8C2D0;width:1350px">Traceability, coverage and better code reviews.</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#8A97AB;text-align:right">13</p>
+<aside>Agreement is only useful if you can prove the code matches it. The next three slides show how.</aside>
+</section>
+<section class="slide hidden" id="trace" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Traceability and coverage</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Every test traces back to an agreement</h2>
+</div>
+<div style="display:flex;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">RULE</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">BR-8</h3>
+<p style="font-size:24px;line-height:1.35;color:#4A5568">Retry once at 6 pm, then fail</p>
+</div>
+<x-connector style="width:36px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">DESIGN</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">X1</h3>
+<p style="font-size:24px;line-height:1.35;color:#4A5568">$300 all day; 6 pm retry fails; push + SMS; no debit</p>
+</div>
+<x-connector style="width:36px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">TASK</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">3.4 gate</h3>
+<p style="font-size:24px;line-height:1.35;color:#4A5568">Tests for H4, E4, E10, X1 must pass</p>
+</div>
+<x-connector style="width:36px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">TEST</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">“X1 …”</h3>
+<p style="font-size:24px;line-height:1.35;color:#4A5568">Automated scenario, named by its ID</p>
+</div>
+<x-connector style="width:36px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#14233B;padding:24px;border-top:6px solid #7CC3C9;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9">QA</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600;color:#F2EFE8">Row X1</h3>
+<p style="font-size:24px;line-height:1.35;color:#B8C2D0">Checked by hand on staging</p>
+</div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568"><b style="color:#14233B">Spec</b> = the rules restated as short, testable WHEN / THEN statements.</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;border-top:3px solid #1F6F78;padding:18px 0 0 0"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1;color:#1F6F78">17 / 17</p><p style="font-size:24px;line-height:1.4;color:#4A5568">business rules proven by a worked case</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;border-top:3px solid #A0621A;padding:18px 0 0 0"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1;color:#A0621A">21 / 21</p><p style="font-size:24px;line-height:1.4;color:#4A5568">worked examples assigned to exactly one gate test</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;border-top:3px solid #14233B;padding:18px 0 0 0"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600;line-height:1.2;color:#14233B">Checked by the AI</p><p style="font-size:24px;line-height:1.4;color:#4A5568">Nothing agreed goes untested; nothing is tested that wasn't agreed</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">Coverage checked on openspec/changes/scheduled-transfers (spec ↔ design ↔ tasks)</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">14</p>
+<aside>Every case has an ID that runs from the agreement to the test to the QA check. Walk the chain on one real case: rule BR-8, retry once at 6 pm then fail; design worked example X1 (given a balance of $300 all day, when the 6 pm retry runs, then the payment fails, push and SMS, nothing debited); task 3.4, the phase-3 gate, whose tests cover H4, E4, E10 and X1 and must pass before phase 4; the automated scenario named "X1 Still short after retry"; and QA checklist row X1, checked by hand on staging, generated from the same IDs. The AI runs the coverage checks, and we ran them on the demo: all 17 business rules are proven by at least one worked case, all 22 spec scenarios are covered, and each of the 21 worked examples is assigned to exactly one gate. It works both ways: forwards, every agreement has a test; backwards, every test and task points to an agreement, so unrequested work stands out. For a bank: "show me where this rule is tested" is answered in one hop, for an auditor, a regulator or a new team member. Example: how do we know a scheduled payment never uses the overdraft? Rule BR-7 and decision D-3, design case E4, task 3.4, the test named E4. When a rule changes, the ID tells you which tests must change.</aside>
+</section>
+<section class="slide hidden" id="coverage-map" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Coverage map · the whole feature on one page</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Every case, under the gate test that proves it</h2>
+<p style="font-size:26px;color:#4A5568">17 rules → 21 cases → 4 gates → 21 tests · <b style="color:#14233B">Uncovered: 0 · Duplicated: 0</b></p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FDFCF9;padding:20px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">PHASE 1 GATE</p>
+<p style="font-size:24px;color:#4A5568">scheduling.feature</p>
+<p style="font-size:24px;background:#DCEBEC;padding:2px 12px;border-radius:6px"><b>H1</b> one-off scheduled</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E1</b> bank holiday</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E2</b> 31st in April</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E3</b> double-tap</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E5</b> cancel in time</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E6</b> cancel too late</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E7</b> joint holder</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E8</b> payee deleted</p>
+<p style="font-size:24px;background:#F2D9D6;padding:2px 12px;border-radius:6px"><b>X5</b> over daily limit</p>
+<p style="font-size:24px;background:#F2D9D6;padding:2px 12px;border-radius:6px"><b>X6</b> not your account</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FDFCF9;padding:20px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">PHASE 2 GATE</p>
+<p style="font-size:24px;color:#4A5568">execution.feature</p>
+<p style="font-size:24px;background:#DCEBEC;padding:2px 12px;border-radius:6px"><b>H2</b> payment made</p>
+<p style="font-size:24px;background:#DCEBEC;padding:2px 12px;border-radius:6px"><b>H3</b> rent rolls forward</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E9</b> run starts twice</p>
+<p style="font-size:24px;background:#F2D9D6;padding:2px 12px;border-radius:6px"><b>X2</b> timeout after debit</p>
+<p style="font-size:24px;background:#F2D9D6;padding:2px 12px;border-radius:6px"><b>X4</b> frozen account</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FDFCF9;padding:20px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">PHASE 3 GATE</p>
+<p style="font-size:24px;color:#4A5568">retry.feature</p>
+<p style="font-size:24px;background:#DCEBEC;padding:2px 12px;border-radius:6px"><b>H4</b> retry succeeds</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E4</b> no overdraft</p>
+<p style="font-size:24px;background:#F3E4CC;padding:2px 12px;border-radius:6px"><b>E10</b> rent continues</p>
+<p style="font-size:24px;background:#F2D9D6;padding:2px 12px;border-radius:6px"><b>X1</b> short after retry</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FDFCF9;padding:20px;border-top:6px solid #14233B;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#14233B">PHASE 4 GATE</p>
+<p style="font-size:24px;color:#4A5568">audit.feature</p>
+<p style="font-size:24px;background:#DCEBEC;padding:2px 12px;border-radius:6px"><b>H5</b> changes audited</p>
+<p style="font-size:24px;background:#F2D9D6;padding:2px 12px;border-radius:6px"><b>X3</b> network down</p>
+<div style="flex:1"></div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568"><b style="color:#14233B">H</b> happy · <b style="color:#14233B">E</b> edge · <b style="color:#14233B">X</b> error</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From design.md worked examples and tasks.md gates 1.10, 2.7, 3.4, 4.4. Map built and re-checked by the AI.</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">15</p>
+<aside>The whole feature on one page. Top line: 17 rules, 21 worked cases, 4 phase gates, 21 tests; uncovered 0, duplicated 0. Walk the columns, one per gate in tasks.md: phase 1 scheduling covers H1, E1, E2, E3, E5 to E8, X5 and X6; phase 2 execution covers H2, H3, E9, X2, X4; phase 3 retry covers H4, E4, E10, X1; phase 4 audit covers H5 and X3. Most of the 21 are edge and error cases: that's where the coverage work is, and where misunderstandings usually hide. The AI builds and re-checks this map every time a document changes: a case with no gate, or a gate naming a case that doesn't exist, shows up immediately. The developer reviews it before approving the tasks. The same IDs appear in the QA checklist. Example: if the business adds a new edge case tomorrow, it gets an ID and lands in one of these columns, and the gate won't pass until its test does; if it lands in no column, the AI flags it.</aside>
+</section>
+<section class="slide hidden" id="review" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Better code reviews</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Every change is checked against the agreement</h2>
+</div>
+<div style="display:flex;gap:32px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#14233B;padding:32px;border-radius:6px;font-family:'IBM Plex Mono', 'Courier New', monospace">
+<p style="font-size:24px;color:#B8C2D0">THE CODE CARRIES REFERENCES</p>
+<p style="font-size:24px;color:#7CC3C9">commit</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">2.3 Debit + outbox + audit in one transaction (design: Decision Flows; H2, X2)</p>
+<p style="font-size:24px;color:#7CC3C9">code comment</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8"># Balance excludes the overdraft (BR-7)</p>
+<p style="font-size:24px;color:#7CC3C9">test</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">Scenario: X2 Timeout after debit is reconciled, never resent</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px 28px;border-top:6px solid #A0621A;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">The review agent checks</h3>
+<ul style="font-size:24px;line-height:1.4;color:#14233B">
+<li>Code does what the cited task and section say</li>
+<li>Every case ID in the gate has a test</li>
+<li>House rules: no network call mid-transaction, masking, audit</li>
+<li>Orphans: code with no reference, references to nothing</li>
+</ul>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px 28px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">The human reviewer decides</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Reads the cited section beside the diff: “does this match what we agreed?” Then signs off the gate.</p>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:32px">
+<p style="flex:1;font-size:26px;line-height:1.4;color:#4A5568"><b style="color:#14233B">Before:</b> reviewers reconstruct intent from the ticket and memory.</p>
+<p style="flex:1;font-size:26px;line-height:1.4;color:#4A5568"><b style="color:#14233B">After:</b> they compare the diff with the cited agreement.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">Illustrative snippets using the demo's real task numbers, sections and case IDs</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">16</p>
+<aside>OpenSpec improves code review. The generated code carries references back to the documents: commit messages cite the task, code cites the design section or decision, tests carry the case ID. A review agent checks every change automatically: does the code do what the cited task and design section say; does every case ID in this phase's gate have a test; do the house rules from the LLD's reviewer checks hold, like no network call inside a database transaction, masked account numbers, audit on every status change; and are there orphans, meaning code with no reference (unrequested work) or references to sections or cases that don't exist (stale). The human reviewer opens the cited section beside the diff, asks one question, "does this match what we agreed?", looks at what the agent flagged, then decides and signs off the gate. Before: reviewers reconstruct intent from the ticket and memory, and mostly check style. After: they compare the diff with the cited agreement, and their attention goes to behaviour and judgement. Example: a change touches the balance check; the code cites rule BR-7; the agent confirms the overdraft is excluded and test E4 exists, and hands it to the human with the decision beside the diff.</aside>
+</section>
+<section class="slide hidden" id="div-keep" data-transition="push" style="background:#14233B;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9;letter-spacing:1px;text-transform:uppercase">Keeping it aligned</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:104px;font-weight:600;line-height:1.06;color:#F2EFE8">Alignment is kept, not just reached</h1>
+<p style="font-size:36px;line-height:1.4;color:#B8C2D0;width:1350px">Extend the documents, keep roles clear, and push every change through the documents first.</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#8A97AB;text-align:right">17</p>
+<aside>Alignment has to be kept, not just reached: extend the documents to what your team values, keep roles clear, and push every change through the documents first.</aside>
+</section>
+<section class="slide hidden" id="extend" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Extending it</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Add the documents your team values</h2>
+</div>
+<div style="display:flex;gap:32px;flex:1">
+<div style="flex:2;display:flex;flex-direction:column;gap:4px;background:#14233B;padding:32px;border-radius:6px;font-family:'IBM Plex Mono', 'Courier New', monospace">
+<p style="font-size:24px;color:#B8C2D0">schema.yaml (abridged)</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">artifacts:</p>
+<p style="font-size:24px;line-height:1.4;color:#8A97AB">  - id: proposal</p>
+<p style="font-size:24px;line-height:1.4;color:#7CC3C9">  - id: business-rules</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">    requires: [proposal]</p>
+<p style="font-size:24px;line-height:1.4;color:#8A97AB">  - id: specs</p>
+<p style="font-size:24px;line-height:1.4;color:#8A97AB">  - id: design</p>
+<p style="font-size:24px;line-height:1.4;color:#7CC3C9">  - id: lld</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">    requires: [design]</p>
+<p style="font-size:24px;line-height:1.4;color:#7CC3C9">  - id: qa-checklist</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">    requires: [specs, design]</p>
+<p style="font-size:24px;line-height:1.4;color:#8A97AB">  - id: tasks</p>
+<p style="font-size:24px;line-height:1.4;color:#F2EFE8">    requires: [..., lld, qa-checklist]</p>
+</div>
+<div style="flex:3;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;gap:20px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">IN OUR SCHEMA</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Low-level design</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Types, limits, locks, retries · reviewer checks per section · house-rules checklist · sign-off</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78">IN OUR SCHEMA</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Manual QA checklist</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Tester rows with the same H/E/X IDs · role sweep · cross-cutting checks · sign-off</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #A0621A;border-radius:6px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#A0621A">ADD YOUR OWN</p>
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:30px;font-weight:600">Whatever your team values</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Per-team design docs (architecture, security review, test plan) · compliance · runbook</p>
+</div>
+<p style="font-size:26px;line-height:1.45;color:#14233B">Each is a template, an instruction and its dependencies. The AI drafts and probes, the owner signs, and it lives in the change folder with the rest.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">From openspec/schemas/spec-driven/schema.yaml and templates/ (lld.md, qa-checklist.md)</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">18</p>
+<aside>OpenSpec isn't a fixed set of documents. The schema file lists them; each has a template (the sections it must have), an instruction (how the AI writes it and what to probe for) and dependencies (what must exist first; for example the tasks can't be written until the LLD and QA checklist exist). Three we already use: the business rules document, which we added between proposal and design and which shows how easy extending is; the low-level design, the implementation decisions a reviewing developer signs off before coding, where every section ends in concrete reviewer checks like "no external HTTP call or email inside a transaction", closing with a project rules checklist and sign-off; and the manual QA checklist, plain-language rows a tester runs by hand on staging, using the same H/E/X IDs as the design and the tests, plus a role sweep, cross-cutting checks and sign-off. A bank might add a business rules catalogue (every rule, its owner and source policy), a compliance checklist, a rollout and runbook plan, or a threat model. Each gets the same treatment: the AI drafts, probes and reflects back; the owner signs; it lives in the change folder. Example: when a tester marks QA row X1 as failed, it maps straight back to design case X1, task 3.4 and the test named X1. In the demo, openspec status shows the LLD and QA checklist still to do; that's the live AI step at the end.</aside>
+</section>
+<section class="slide hidden" id="matrix" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Roles and flow</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Who does what, and how it flows</h2>
+</div>
+<table style="font-size:24px;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr><th style="width:17%;text-align:left">Document</th><th style="width:22%;text-align:left">Business</th><th style="width:22%;text-align:left">Engineering teams</th><th style="width:16%;text-align:left">Developer</th><th style="width:23%;text-align:left;color:#A0621A">AI</th></tr>
+<tr><td><b>Proposal</b></td><td><b>Sponsor signs</b></td><td>Check feasibility</td><td>Co-authors</td><td style="color:#4A5568">Explores; drafts</td></tr>
+<tr><td><b>Business rules</b></td><td><b>Product, risk, compliance sign</b></td><td>Check feasibility</td><td>Co-authors</td><td style="color:#4A5568">Probes; organises</td></tr>
+<tr><td><b>Design</b></td><td style="color:#4A5568">Informed</td><td><b>Dev, arch, security, QA sign</b></td><td>Owns</td><td style="color:#4A5568">Probes for cases; drafts</td></tr>
+<tr><td><b>Tasks</b></td><td style="color:#4A5568">—</td><td>Review</td><td><b>Owns; approves gates</b></td><td style="color:#4A5568">Reflects back; builds; stops</td></tr>
+<tr><td><b>QA checklist</b></td><td><b>Accepts</b></td><td>QA runs it</td><td>Fixes defects</td><td style="color:#4A5568">Drafts from the cases</td></tr>
+</table>
+<div style="display:flex;align-items:stretch">
+<p style="flex:1;font-size:24px;line-height:1.3;background:#F3E4CC;padding:14px 16px;border-radius:6px"><b>1</b> Explore: the AI probes</p>
+<x-connector style="width:32px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:24px;line-height:1.3;background:#DCEBEC;padding:14px 16px;border-radius:6px"><b>2</b> People decide</p>
+<x-connector style="width:32px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:24px;line-height:1.3;background:#F3E4CC;padding:14px 16px;border-radius:6px"><b>3</b> AI reflects back; we agree</p>
+<x-connector style="width:32px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:24px;line-height:1.3;background:#F3E4CC;padding:14px 16px;border-radius:6px"><b>4</b> AI builds from the documents</p>
+<x-connector style="width:32px;align-self:center;color:#8A97AB;border-width:3px" head="end"></x-connector>
+<p style="flex:1;font-size:24px;line-height:1.3;background:#DCEBEC;padding:14px 16px;border-radius:6px"><b>5</b> People check at every gate</p>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#4A5568">The AI probes and drafts everything, and decides nothing. Changes go into the documents first, then the code.</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">19</p>
+<aside>Every party has a defined part in every document. Proposal: the business sponsor signs; the engineering teams check feasibility; the developer co-authors; the AI explores and drafts. Business rules: product, risk and compliance decide and sign; the engineering teams check feasibility; the AI probes and organises. Design: development, architecture, security and QA each review and sign; the developer owns it; the AI probes for cases and drafts it, and later reads it as its brief; the business is informed. Tasks: the developer owns them and approves each gate; the engineering teams review; the AI reflects back the plan, builds, and stops at gates. QA checklist: QA runs it and the business accepts; the AI drafts it from the worked cases; the developer fixes defects. The flow underneath: explore, where the AI probes the idea; people decide; the AI reflects back and we agree; the AI builds from the documents; people check at every gate. The rule: when something changes, it changes in the documents first, then in the code. For leaders: no decision reaches code without a named signatory.</aside>
+</section>
+<section class="slide hidden" id="midflight" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Keeping alignment when things change</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">The business moves the retry to 8 pm: one change, one review</h2>
+</div>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:3;display:flex;flex-direction:column;gap:8px;background:#14233B;padding:32px;border-radius:6px;font-family:'IBM Plex Mono', 'Courier New', monospace">
+<p style="font-size:24px;color:#B8C2D0">business-rules.md · BR-8, D-3</p>
+<p style="font-size:24px;line-height:1.35;color:#E8B06A">- … retried once at 6 pm the same day, then fails.</p>
+<p style="font-size:24px;line-height:1.35;color:#7CC3C9">+ … retried once at 8 pm the same day, then fails.</p>
+<p style="font-size:24px;line-height:1.35;color:#7CC3C9">+ Changed from 6 pm: late salary credits land up to 19:30</p>
+<p style="font-size:24px;color:#B8C2D0">spec.md · design.md H4 · tasks.md 3.1</p>
+<p style="font-size:24px;line-height:1.35;color:#7CC3C9">+ … SHALL retry once at 8 pm the same day</p>
+<p style="font-size:24px;line-height:1.35;color:#7CC3C9">+ Salary $3,000.00 arrives 14:00; 20:00 retry</p>
+<p style="font-size:24px;line-height:1.35;color:#7CC3C9">+ InsufficientFundsRetryJob (20:00 cron …)</p>
+</div>
+<div style="flex:2;display:flex;flex-direction:column;justify-content:center;gap:24px">
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:72px;font-weight:600;line-height:1;color:#14233B">22 lines</p><p style="font-size:26px;color:#4A5568">in 4 documents, in one commit</p></div>
+<p style="font-size:26px;line-height:1.45;color:#14233B"><b>The proposal didn't change.</b> The rule lives in one place: the business rules.</p>
+<p style="font-size:26px;line-height:1.45;color:#4A5568">Product and risk review the rule. Engineers review the design and tasks. The next AI session reads it.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1480px;font-size:24px;color:#6B7280">Real diff in the demo repository: git diff master retry-8pm (4 files, 22 insertions, 22 deletions)</p>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">20</p>
+<aside>Alignment is not a one-time event. Here the business changes one rule mid-flight: the insufficient-funds retry moves from 6 pm to 8 pm because late salary credits land up to 19:30. We made this change for real in the demo repository. It touched 22 lines in 4 documents in one commit: the business rules (rule BR-8, decision D-3 with the reason, and customer message MSG-3), the spec, the design's lifecycle, sequences and worked cases, and one task. The proposal didn't change at all, because it's high level; the rule lives in exactly one place. Product and risk review the rule and decision, engineers review the design and tasks, and every future AI session reads the updated rule. Without shared documents, the same rule is scattered across tickets, chats, code and tests.</aside>
+</section>
+<section class="slide hidden" id="div-adopt" data-transition="push" style="background:#14233B;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:36px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9;letter-spacing:1px;text-transform:uppercase">Adopting it</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:104px;font-weight:600;line-height:1.06;color:#F2EFE8">Costs and wider benefits</h1>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#8A97AB;text-align:right">21</p>
+<aside>An honest look at what it costs, then what else gets better.</aside>
+</section>
+<section class="slide hidden" id="costs" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Costs and limits</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">What it asks of us, and what it does not fix</h2>
+</div>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FDFCF9;padding:40px;border-radius:6px;border-top:6px solid #14233B">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600">Costs</h3>
+<ul style="font-size:28px;line-height:1.5;color:#14233B">
+<li>Review time moves earlier: proposal and design are reviewed before code</li>
+<li>Discipline: changes go through the documents first, every time</li>
+<li>One-off effort to tailor templates to the bank's standards</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FDFCF9;padding:40px;border-radius:6px;border-top:6px solid #A0621A">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:36px;font-weight:600">Limits</h3>
+<ul style="font-size:28px;line-height:1.5;color:#14233B">
+<li>A wrong decision, agreed by everyone, is still wrong</li>
+<li>AI output still needs code review; the gates make it focused, not optional</li>
+<li>Start small: one team, one feature, and see what it surfaces</li>
+</ul>
+</div>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">22</p>
+<aside>State the costs plainly. The main cost is review time, but it is moved, not added: the questions get answered either way, the only choice is whether before code or during rework. The discipline cost is real: if people bypass the documents, it drifts and loses its value. And OpenSpec doesn't make decisions better, only explicit; a poor decision agreed by everyone ships just as reliably.</aside>
+</section>
+<section class="slide hidden" id="sdlc" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Beyond the build</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">Also better across the rest of the SDLC</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #A0621A;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Incidents</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Bug or spec gap? Broke an agreed case: fix the code. No case: add one, test it, sign it.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Living documentation</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Archived specs describe how the system behaves, for new joiners and every AI session.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Change impact</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">The proposal names what it touches; spec changes show which behaviours to retest.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #14233B;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Audit evidence</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Who approved this rule, and where is it tested? Answered from the repository.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #1F6F78;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Release and support</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Customer wording, FAQ, alerts and help pages ready before release, not after.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #14233B;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Estimation</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Estimate from settled decisions and a real task list, not a one-liner.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FDFCF9;padding:24px;border-top:6px solid #14233B;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600">Handovers</h3>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">A new developer or AI session resumes at the first unticked task, with full context.</p>
+</div>
+<div style="display:flex;flex-direction:column;justify-content:center;gap:8px;background:#14233B;padding:24px;border-top:6px solid #7CC3C9;border-radius:6px">
+<h3 style="font-family:'Source Serif 4', Georgia, serif;font-size:28px;font-weight:600;color:#F2EFE8">Same mechanism</h3>
+<p style="font-size:24px;line-height:1.4;color:#B8C2D0">Agreed, written, traced.</p>
+</div>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">23</p>
+<aside>The same mechanism, agreed, written and traced, improves much more than building the feature. Incidents: every production issue is either a bug (the code broke an agreed case, so fix the code) or a spec gap (no case covered it, so add a case, a test and a signature); root cause becomes a category, not a debate. Living documentation: when a change is archived, its agreed behaviour merges into the system's living specs, which new joiners and every future AI session read. Change impact: the proposal lists which existing capabilities a change touches, and spec changes show exactly which agreed behaviours change, so you know what to retest. Audit evidence: signed decisions, version history and traced tests, so "who approved this rule and where is it tested?" is answered from the repository. Release and support: customer wording, FAQ, operations alerts and help pages are written before release. Estimation: from settled decisions and a real task list, not a one-liner. Handovers: a new developer or AI session resumes at the first unticked task. Example: a customer complains a payment failed on a holiday. Look up case E1: pay on the next working day. If the code didn't, it's a bug; if the case didn't exist, it's a gap, and it gets added, tested and signed.</aside>
+</section>
+<section class="slide hidden" id="summary" data-transition="fade" style="background:#F7F5F0;color:#14233B;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#1F6F78;letter-spacing:1px;text-transform:uppercase">Summary</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#14233B">One agreed picture, built and kept</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:0">
+<div style="display:flex;gap:40px;padding:28px 0;border-top:1px solid #DDD8CC"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:44px;font-weight:600;color:#1F6F78;width:120px">1</p><div style="flex:1;display:flex;flex-direction:column;gap:6px"><p style="font-size:32px;line-height:1.35;color:#14233B">Alignment means one agreed picture, shared by the business, the team, the developer and the AI.</p><p style="font-size:24px;color:#4A5568">The same decisions, scope, cases and build plan</p></div></div>
+<div style="display:flex;gap:40px;padding:28px 0;border-top:1px solid #DDD8CC"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:44px;font-weight:600;color:#1F6F78;width:120px">2</p><div style="flex:1;display:flex;flex-direction:column;gap:6px"><p style="font-size:32px;line-height:1.35;color:#14233B">For each document, the AI probes, reflects back what is and isn't covered, and we agree.</p><p style="font-size:24px;color:#4A5568">Rules: 17, with owners · Design: 21 cases · Tasks: 26 steps · traced: 17/17 rules, 21/21 cases</p></div></div>
+<div style="display:flex;gap:40px;padding:28px 0;border-top:1px solid #DDD8CC;border-bottom:1px solid #DDD8CC"><p style="font-family:'Source Serif 4', Georgia, serif;font-size:44px;font-weight:600;color:#1F6F78;width:120px">3</p><div style="flex:1;display:flex;flex-direction:column;gap:6px"><p style="font-size:32px;line-height:1.35;color:#14233B">It stays aligned: every change goes through the documents first.</p><p style="font-size:24px;color:#4A5568">The 8 pm change: 22 lines, 4 documents, proposal untouched, one review</p></div></div>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#6B7280;text-align:right">24</p>
+<aside>Close part one on the three lines, then move to the demo.</aside>
+</section>
+<section class="slide hidden" id="demo" data-transition="fade" style="background:#14233B;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:24px;color:#7CC3C9;letter-spacing:1px;text-transform:uppercase">Part 2 · Live demo</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:60px;font-weight:600;line-height:1.12;color:#F2EFE8">The agreed change, opened up</h2>
+</div>
+<div style="display:flex;gap:48px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#1C2F4C;padding:40px;border-radius:6px;font-family:'IBM Plex Mono', 'Courier New', monospace">
+<p style="font-size:26px;color:#B8C2D0">openspec/changes/scheduled-transfers/</p>
+<p style="font-size:26px;color:#F2EFE8">├─ proposal.md</p>
+<p style="font-size:26px;color:#F2EFE8">├─ business-rules.md</p>
+<p style="font-size:26px;color:#F2EFE8">├─ specs/scheduled-transfers/spec.md</p>
+<p style="font-size:26px;color:#F2EFE8">├─ design.md</p>
+<p style="font-size:26px;color:#F2EFE8">├─ tasks.md</p>
+<p style="font-size:26px;color:#E8B06A">├─ lld.md           ← generated live</p>
+<p style="font-size:26px;color:#E8B06A">└─ qa-checklist.md  ← generated live</p>
+<div style="flex:1"></div>
+<p style="font-size:24px;color:#7CC3C9">$ openspec validate --strict   valid</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:28px;line-height:1.45;color:#F2EFE8"><b>1.</b> The proposal: why, stories, scope (high level)</p>
+<p style="font-size:28px;line-height:1.45;color:#F2EFE8"><b>2.</b> The business rules: rules, decisions, wording</p>
+<p style="font-size:28px;line-height:1.45;color:#F2EFE8"><b>3.</b> The design: lifecycle, worked examples, cross-cutting concerns</p>
+<p style="font-size:28px;line-height:1.45;color:#F2EFE8"><b>4.</b> The tasks: citations and phase gates</p>
+<p style="font-size:28px;line-height:1.45;color:#F2EFE8"><b>5.</b> The 8 pm change: git diff master retry-8pm</p>
+<p style="font-size:28px;line-height:1.45;color:#F2EFE8"><b>6.</b> The AI probing a new idea live, and reflecting back scope</p>
+</div>
+</div>
+<p data-num style="position:absolute;right:128px;bottom:64px;width:80px;font-size:24px;color:#8A97AB;text-align:right">25</p>
+<aside>Suggested demo order. Open proposal.md and show the why, stories and not-covered table; then business-rules.md with the rule catalogue, decisions and wording. Open design.md and show the execution lifecycle diagram, worked examples and cross-cutting tables. Open tasks.md and show a phase gate. Run git diff master retry-8pm to show the change flowing through all four documents. Finally, start the explore step on a small new idea (e.g. let customers pause a recurring payment) and let the audience watch the AI probe with questions and reflect back what is in and out of scope; or have it draft the low-level design live.</aside>
+</section>
+</div>
+<div id="notes"></div><div id="count"></div>
+<script>
+const s=[...document.querySelectorAll('.slide')];let i=0;const st=document.getElementById('stage'),nb=document.getElementById('notes'),c=document.getElementById('count');
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform=`translate(${(innerWidth-1920*k)/2}px,${(innerHeight-1080*k)/2}px) scale(${k})`}
+function show(n){i=Math.max(0,Math.min(s.length-1,n));s.forEach((e,j)=>e.classList.toggle('hidden',j!==i));const a=s[i].querySelector('aside');nb.textContent=a?a.textContent:'';c.textContent=(i+1)+' / '+s.length+'  ·  ←/→ to move, N for notes';location.hash=i+1}
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))show(i+1);else if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);else if(e.key==='Home')show(0);else if(e.key==='End')show(s.length-1);else if(e.key==='n'||e.key==='N')nb.style.display=nb.style.display==='block'?'none':'block'});
+addEventListener('click',e=>{if(!nb.contains(e.target))show(e.clientX>innerWidth/2?i+1:i-1)});
+addEventListener('resize',fit);fit();show((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>
